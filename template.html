@@ -1,0 +1,2309 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Thang đo pH: phần cơ bản - PhET Interactive Simulations</title>
+  <style>
+    /* CSS Reset & Canvas Shell */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #000000;
+      font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navigation Bar */
+    #top-bar {
+      height: 52px;
+      min-height: 52px;
+      background: linear-gradient(180deg, #243342 0%, #17222c 100%);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 2px solid #33485d;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+      gap: 12px;
+    }
+    .top-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 17px;
+      font-weight: bold;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+    .top-logo {
+      height: 34px;
+      width: 34px;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+      vertical-align: middle;
+      border: 1.5px solid rgba(255,255,255,0.4);
+    }
+
+    /* Mode Switcher Tabs */
+    .mode-switcher-container {
+      display: flex;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1.5px solid rgba(255, 255, 255, 0.22);
+      border-radius: 24px;
+      padding: 3px;
+      gap: 4px;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.4);
+    }
+    .mode-tab-btn {
+      background: transparent;
+      border: none;
+      color: #b5c7db;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 13.5px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      outline: none;
+    }
+    .mode-tab-btn:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.12);
+    }
+    .mode-tab-btn.active.meter-tab {
+      background: linear-gradient(135deg, #0288d1 0%, #01579b 100%);
+      color: #ffffff;
+      box-shadow: 0 2px 10px rgba(2, 136, 209, 0.5);
+    }
+    .mode-tab-btn.active.paper-tab {
+      background: linear-gradient(135deg, #e91e63 0%, #8e24aa 100%);
+      color: #ffffff;
+      box-shadow: 0 2px 10px rgba(233, 30, 99, 0.5);
+    }
+    .mode-tab-btn .tab-icon {
+      font-size: 16px;
+    }
+
+    /* Top Controls (Right) */
+    .top-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+    .top-btn {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      color: #ffffff;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .top-btn:hover {
+      background: rgba(255, 255, 255, 0.22);
+      border-color: rgba(255, 255, 255, 0.45);
+      transform: translateY(-1px);
+    }
+    .top-btn:active {
+      transform: translateY(1px);
+    }
+
+    /* Simulation Canvas Container */
+    #sim-container {
+      flex: 1;
+      width: 100%;
+      height: calc(100% - 52px - 38px);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #eef2f5;
+      overflow: hidden;
+    }
+    #sim-svg {
+      width: 100%;
+      height: 100%;
+      max-width: calc((100vh - 90px) * 1100 / 700);
+      max-height: calc(100vw * 700 / 1100);
+      touch-action: none;
+      filter: drop-shadow(0 4px 18px rgba(0,0,0,0.2));
+      background-color: #ffffff;
+    }
+
+    /* Bottom Navigation Bar (PhET official style) */
+    #bottom-bar {
+      height: 38px;
+      min-height: 38px;
+      background: #000000;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      font-size: 13px;
+      z-index: 100;
+    }
+    .bottom-edu-logo {
+      height: 28px;
+      width: 28px;
+      border-radius: 50%;
+      object-fit: cover;
+      cursor: pointer;
+      border: 1.5px solid rgba(255, 255, 255, 0.45);
+      transition: transform 0.15s ease, border-color 0.15s ease;
+      vertical-align: middle;
+    }
+    .bottom-edu-logo:hover {
+      transform: scale(1.08);
+      border-color: #ffffff;
+    }
+    .bottom-screen-title {
+      color: #eeeeee;
+      font-weight: bold;
+      letter-spacing: 0.3px;
+    }
+
+    /* Dropdown UI styling */
+    .solute-dropdown {
+      position: absolute;
+      background: #ffffff;
+      border: 2px solid #444444;
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+      max-height: 380px;
+      overflow-y: auto;
+      z-index: 500;
+      display: none;
+    }
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 9px 14px;
+      cursor: pointer;
+      font-size: 15px;
+      color: #222222;
+      transition: background 0.1s;
+    }
+    .dropdown-item:hover {
+      background-color: #daffff;
+    }
+    .dropdown-item.active {
+      background-color: #c0f4f4;
+      font-weight: bold;
+    }
+    .color-swatch {
+      width: 22px;
+      height: 22px;
+      border-radius: 3px;
+      border: 1px solid rgba(0,0,0,0.35);
+      flex-shrink: 0;
+    }
+    .dropdown-item-ph {
+      margin-left: auto;
+      font-size: 13px;
+      color: #555555;
+      font-weight: bold;
+    }
+
+    /* Help Modal */
+    #help-modal {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #ffffff;
+      padding: 24px 28px;
+      border-radius: 12px;
+      box-shadow: 0 14px 40px rgba(0,0,0,0.45);
+      max-width: 580px;
+      width: 92%;
+      z-index: 1000;
+      color: #333;
+    }
+    #help-modal h3 {
+      margin-bottom: 14px;
+      color: #1e2b37;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 18px;
+    }
+    #help-modal ul {
+      margin-left: 20px;
+      line-height: 1.65;
+      font-size: 14px;
+    }
+    #help-modal li {
+      margin-bottom: 8px;
+    }
+    #help-modal button.close-btn {
+      margin-top: 18px;
+      width: 100%;
+      padding: 11px;
+      background: #243342;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    #help-modal button.close-btn:hover {
+      background: #33485d;
+    }
+
+    /* Draggable strips cursor styles */
+    .draggable-strip {
+      cursor: grab;
+    }
+    .draggable-strip:active {
+      cursor: grabbing;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Title & Controls Bar -->
+  <header id="top-bar">
+    <div class="top-left">
+      <img src="{{LOGO_EDU}}" alt="Logo" class="top-logo" />
+      <span>Thang đo pH: phần cơ bản</span>
+    </div>
+
+    <!-- Mode Switcher in the top bar -->
+    <div class="mode-switcher-container" title="Chuyển đổi chế độ đo pH">
+      <button id="mode-meter-btn" class="mode-tab-btn active meter-tab" title="Chế độ Máy đo pH điện tử">
+        <span class="tab-icon">📟</span>
+        <span>Máy đo pH</span>
+      </button>
+      <button id="mode-paper-btn" class="mode-tab-btn paper-tab" title="Chế độ Giấy chỉ thị màu (Quỳ tím, Phenolphtalein, Giấy đo pH)">
+        <span class="tab-icon">🧪</span>
+        <span>Giấy chỉ thị màu</span>
+      </button>
+    </div>
+
+    <div class="top-controls">
+      <button id="btn-sound" class="top-btn" title="Bật/Tắt âm thanh">
+        <span id="sound-icon">🔊</span>
+        <span id="sound-text">Âm thanh</span>
+      </button>
+      <button id="btn-help" class="top-btn" title="Hướng dẫn sử dụng">
+        <span>❓</span>
+        <span>Hướng dẫn</span>
+      </button>
+      <button id="btn-fullscreen" class="top-btn" title="Chế độ toàn màn hình">
+        <span>⛶</span>
+        <span>Toàn màn hình</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Simulation Stage -->
+  <main id="sim-container">
+    <svg id="sim-svg" viewBox="0 0 1100 700" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- pH Scale Gradient: Basic (top) -> Neutral (middle) -> Acidic (bottom) -->
+        <linearGradient id="phScaleGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#4681ce" />   <!-- Royal Blue: pH 14 -->
+          <stop offset="50%" stop-color="#ffffff" />  <!-- Neutral White: pH 7 -->
+          <stop offset="100%" stop-color="#ee4f49" /> <!-- Warm Red: pH 0 -->
+        </linearGradient>
+
+        <!-- Beaker Glass Sheen -->
+        <linearGradient id="beakerSheen" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="rgba(255,255,255,0.4)" />
+          <stop offset="8%" stop-color="rgba(255,255,255,0.8)" />
+          <stop offset="25%" stop-color="rgba(255,255,255,0.1)" />
+          <stop offset="85%" stop-color="rgba(255,255,255,0.1)" />
+          <stop offset="96%" stop-color="rgba(255,255,255,0.7)" />
+          <stop offset="100%" stop-color="rgba(200,220,240,0.3)" />
+        </linearGradient>
+
+        <!-- Water Stream Gradient -->
+        <linearGradient id="waterStreamGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="rgba(224,255,255,0.7)" />
+          <stop offset="50%" stop-color="rgba(255,255,255,0.95)" />
+          <stop offset="100%" stop-color="rgba(180,230,240,0.8)" />
+        </linearGradient>
+
+        <!-- Dropper Glass Sheen -->
+        <linearGradient id="dropperGlassGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="rgba(255,255,255,0.7)" />
+          <stop offset="30%" stop-color="rgba(255,255,255,0.2)" />
+          <stop offset="70%" stop-color="rgba(255,255,255,0.1)" />
+          <stop offset="100%" stop-color="rgba(0,0,0,0.15)" />
+        </linearGradient>
+
+        <!-- Shadow Filters -->
+        <filter id="btnShadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="1" dy="3" stdDeviation="3" flood-opacity="0.3" />
+        </filter>
+        <filter id="probeShadow" x="-30%" y="-30%" width="160%" height="160%">
+          <feDropShadow dx="2" dy="5" stdDeviation="4" flood-opacity="0.35" />
+        </filter>
+        <filter id="cardShadow" x="-10%" y="-10%" width="125%" height="125%">
+          <feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.18" />
+        </filter>
+      </defs>
+
+      <!-- Simulation Background -->
+      <rect width="1100" height="700" fill="#ffffff" />
+
+      <!-- ======================================================================
+           COMMON SIMULATION ELEMENTS: BEAKER, FAUCETS, DROPPER, SOLUTES
+           (IDENTICAL & PERSISTENT IN BOTH MODES!)
+           ====================================================================== -->
+
+      <!-- ================= 2. BEAKER & LIQUID (CENTER) ================= -->
+      <g id="beaker-group" style="pointer-events: none;">
+        <!-- Liquid in Beaker -->
+        <clipPath id="beakerClip">
+          <path d="M 525,280 L 525,565 Q 525,580 540,580 L 960,580 Q 975,580 975,565 L 975,280 Z" />
+        </clipPath>
+
+        <g clip-path="url(#beakerClip)">
+          <!-- Main Liquid Body -->
+          <rect id="liquid-body" x="525" y="455" width="450" height="125" fill="#e0ffff" />
+          <!-- Liquid Surface Line with Shimmer -->
+          <line id="liquid-surface-line" x1="525" y1="455" x2="975" y2="455" stroke="rgba(255,255,255,0.7)" stroke-width="3" />
+          <!-- Animated Ripples/Waves -->
+          <path id="liquid-waves" d="M 525,455 Q 637,453 750,455 T 975,455 L 975,465 L 525,465 Z" fill="rgba(255,255,255,0.3)" opacity="0" />
+        </g>
+
+        <!-- Beaker Glass Outline (with flared top rim) -->
+        <path d="M 505,260 L 525,280 L 525,565 Q 525,580 540,580 L 960,580 Q 975,580 975,565 L 975,280 L 995,260" 
+              fill="url(#beakerSheen)" stroke="#000000" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
+
+        <!-- Beaker Volume Graduation Ticks -->
+        <g id="beaker-ticks">
+          <!-- 0.1 L -->
+          <line x1="525" y1="555" x2="540" y2="555" stroke="#000" stroke-width="2" />
+          <line x1="975" y1="555" x2="960" y2="555" stroke="#000" stroke-width="2" />
+          <!-- 0.2 L -->
+          <line x1="525" y1="530" x2="540" y2="530" stroke="#000" stroke-width="2" />
+          <line x1="975" y1="530" x2="960" y2="530" stroke="#000" stroke-width="2" />
+          <!-- 0.3 L -->
+          <line x1="525" y1="505" x2="540" y2="505" stroke="#000" stroke-width="2" />
+          <line x1="975" y1="505" x2="960" y2="505" stroke="#000" stroke-width="2" />
+          <!-- 0.4 L -->
+          <line x1="525" y1="480" x2="540" y2="480" stroke="#000" stroke-width="2" />
+          <line x1="975" y1="480" x2="960" y2="480" stroke="#000" stroke-width="2" />
+          <!-- 0.5 L (MAJOR TICK 30px + Label 1/2) -->
+          <line x1="525" y1="455" x2="555" y2="455" stroke="#000" stroke-width="2.5" />
+          <line x1="975" y1="455" x2="945" y2="455" stroke="#000" stroke-width="2.5" />
+          <text x="562" y="455" font-size="16" font-weight="bold" dominant-baseline="middle" fill="#000">1/2</text>
+          <!-- 0.6 L -->
+          <line x1="525" y1="430" x2="540" y2="430" stroke="#000" stroke-width="2" />
+          <line x1="975" y1="430" x2="960" y2="430" stroke="#000" stroke-width="2" />
+          <!-- 0.7 L -->
+          <line x1="525" y1="405" x2="540" y2="405" stroke="#000" stroke-width="2" />
+          <line x1="975" y1="405" x2="960" y2="405" stroke="#000" stroke-width="2" />
+          <!-- 0.8 L -->
+          <line x1="525" y1="380" x2="540" y2="380" stroke="#000" stroke-width="2" />
+          <line x1="975" y1="380" x2="960" y2="380" stroke="#000" stroke-width="2" />
+          <!-- 0.9 L -->
+          <line x1="525" y1="355" x2="540" y2="355" stroke="#000" stroke-width="2" />
+          <line x1="975" y1="355" x2="960" y2="355" stroke="#000" stroke-width="2" />
+          <!-- 1.0 L (MAJOR TICK 30px + Label 1) -->
+          <line x1="525" y1="330" x2="555" y2="330" stroke="#000" stroke-width="2.5" />
+          <line x1="975" y1="330" x2="945" y2="330" stroke="#000" stroke-width="2.5" />
+          <text x="562" y="330" font-size="16" font-weight="bold" dominant-baseline="middle" fill="#000">1</text>
+        </g>
+
+        <!-- Neutral Indicator Badge at bottom center of beaker -->
+        <g id="neutral-badge" transform="translate(750, 545)" opacity="1">
+          <rect x="-65" y="-18" width="130" height="36" rx="8" fill="rgba(240, 240, 240, 0.75)" stroke="rgba(0,0,0,0.3)" stroke-width="1.5" />
+          <text x="0" y="2" fill="#222" font-size="18" font-weight="bold" text-anchor="middle" dominant-baseline="middle">Trung tính</text>
+        </g>
+
+        <!-- Volume Pointer on Right Edge of Beaker -->
+        <g id="volume-indicator" transform="translate(978, 455)">
+          <polygon points="0,0 12,-7 12,7" fill="#000000" />
+          <text id="volume-text" x="18" y="5" font-size="16" font-weight="bold" fill="#000000">0.50 L</text>
+        </g>
+      </g>
+
+      <!-- ================= 3. STREAMS (WATER, DROPPER, DRAIN) ================= -->
+      <!-- Water Faucet Stream: x: 915 to 935 -->
+      <g id="water-stream-group" style="display: none;">
+        <rect id="water-stream-rect" x="915" y="235" width="20" height="220" fill="url(#waterStreamGrad)" stroke="rgba(100,180,240,0.5)" stroke-width="1" rx="4" />
+        <ellipse id="water-splash" cx="925" cy="455" rx="22" ry="7" fill="rgba(255,255,255,0.7)" />
+      </g>
+
+      <!-- Dropper Stream: x: 695 to 705 -->
+      <g id="dropper-stream-group" style="display: none;">
+        <rect id="dropper-stream-rect" x="696" y="265" width="8" height="190" fill="#e0ffff" rx="3" />
+        <ellipse id="dropper-splash" cx="700" cy="455" rx="14" ry="5" fill="rgba(255,255,255,0.6)" />
+      </g>
+
+      <!-- Drain Faucet Stream: x: 442 to 458 -->
+      <g id="drain-stream-group" style="display: none;">
+        <rect id="drain-stream-rect" x="442" y="623" width="16" height="77" fill="#e0ffff" rx="4" />
+      </g>
+
+      <!-- ================= 4. WATER FAUCET (TOP-RIGHT) WITH GENUINE PHET TEXTURES ================= -->
+      <g id="water-faucet-group" transform="translate(925, 235) scale(-0.6, 0.6)">
+        <rect x="-101.5" y="-158" width="80" height="15" fill="rgb(107,107,107)" />
+        <image href="{{IMAGE_dI}}" x="-625" y="-168" width="515" height="84" preserveAspectRatio="none" />
+        <image href="{{IMAGE_LI}}" x="-42.5" y="-85" width="85" height="22" preserveAspectRatio="none" />
+        <image href="{{IMAGE_SI}}" x="-59" y="-64" width="118" height="64" />
+        <image href="{{IMAGE_nI}}" x="-111.5" y="-168" width="154" height="84" />
+
+        <g id="water-shooter-group" transform="translate(-107.5, -194)">
+          <image href="{{IMAGE_PI}}" x="0" y="0" width="110" height="22" />
+          <image href="{{IMAGE__I}}" x="13" y="6.5" width="9" height="9" />
+          <image href="{{IMAGE_oI}}" x="109" y="-17" width="29" height="56" />
+          <image href="{{IMAGE_hI}}" x="109" y="-17" width="29" height="56" />
+          <g id="water-slider-knob" cursor="pointer" filter="url(#btnShadow)">
+            <rect x="110" y="-30" width="70" height="80" fill="transparent" />
+            <image href="{{IMAGE_mI}}" x="130" y="-25" width="43.8" height="72" />
+            <image href="{{IMAGE_fI}}" x="130" y="-25" width="43.8" height="72" />
+          </g>
+        </g>
+        <image href="{{IMAGE_DI}}" x="-111.5" y="-199" width="106" height="46" pointer-events="none" />
+      </g>
+
+      <!-- ================= 5. DRAIN FAUCET (BOTTOM-LEFT) WITH GENUINE PHET TEXTURES ================= -->
+      <g id="drain-faucet-group" transform="translate(450, 623) scale(-0.6, 0.6)">
+        <rect x="-101.5" y="-143" width="80" height="15" fill="rgb(107,107,107)" />
+        <image href="{{IMAGE_dI}}" x="-236" y="-153" width="126" height="84" preserveAspectRatio="none" />
+        <image href="{{IMAGE_LI}}" x="-42.5" y="-70" width="85" height="7" preserveAspectRatio="none" />
+        <image href="{{IMAGE_SI}}" x="-59" y="-64" width="118" height="64" />
+        <image href="{{IMAGE_nI}}" x="-111.5" y="-153" width="154" height="84" />
+
+        <g id="drain-shooter-group" transform="translate(-107.5, -179)">
+          <image href="{{IMAGE_PI}}" x="0" y="0" width="110" height="22" />
+          <image href="{{IMAGE__I}}" x="13" y="6.5" width="9" height="9" />
+          <image href="{{IMAGE_oI}}" x="109" y="-17" width="29" height="56" />
+          <image href="{{IMAGE_hI}}" x="109" y="-17" width="29" height="56" />
+          <g id="drain-slider-knob" cursor="pointer" filter="url(#btnShadow)">
+            <rect x="110" y="-30" width="70" height="80" fill="transparent" />
+            <image href="{{IMAGE_mI}}" x="130" y="-25" width="43.8" height="72" />
+            <image href="{{IMAGE_fI}}" x="130" y="-25" width="43.8" height="72" />
+          </g>
+        </g>
+        <image href="{{IMAGE_DI}}" x="-111.5" y="-184" width="106" height="46" pointer-events="none" />
+      </g>
+
+      <!-- ================= 6. DROPPER (TOP CENTER-LEFT) ================= -->
+      <g id="dropper-group" transform="translate(700, 265)">
+        <path id="dropper-fluid" d="M -7,-12 L -7,-35 L -20,-75 L -20,-130 L 20,-130 L 20,-75 L 7,-35 L 7,-12 Z" fill="#e0ffff" />
+        
+        <path d="M -7,0 L -7,-35 L -22,-75 L -22,-130 L 22,-130 L 22,-75 L 7,-35 L 7,0 Z" 
+              fill="url(#dropperGlassGrad)" stroke="#222222" stroke-width="2.5" stroke-linejoin="round" />
+        <ellipse cx="0" cy="0" rx="7" ry="2.5" fill="#333333" />
+
+        <g id="dropper-btn-group" transform="translate(-25, -195)" cursor="pointer" filter="url(#btnShadow)">
+          <image id="dropper-btn-img-norm" href="{{IMAGE_aL}}" x="0" y="0" width="50" height="126" />
+          <image id="dropper-btn-img-press" href="{{IMAGE_cL}}" x="0" y="0" width="50" height="126" style="display: none;" />
+        </g>
+      </g>
+
+      <!-- ======================================================================
+           MODE 1: DIGITAL pH METER & SCALE (VISIBLE IN METER MODE)
+           ====================================================================== -->
+      <g id="meter-mode-group">
+        <!-- 1. pH Scale (Left Panel) -->
+        <g id="ph-scale-group" transform="translate(150, 75)">
+          <!-- Scale Bar (Width: 55, Height: 450) -->
+          <rect id="scale-bar" x="0" y="0" width="55" height="450" fill="url(#phScaleGrad)" stroke="#000000" stroke-width="2" rx="2" />
+          
+          <!-- Text Inside Scale: 'Tính base' (top half) and 'Tính acid' (bottom half) -->
+          <text x="27.5" y="112.5" fill="#000000" font-size="20" font-weight="bold" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90 27.5 112.5)">Tính base</text>
+          <text x="27.5" y="337.5" fill="#000000" font-size="20" font-weight="bold" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90 27.5 337.5)">Tính acid</text>
+
+          <!-- Ticks & Numbers (0 to 14) -->
+          <g id="scale-ticks">
+            <!-- 14 -->
+            <line x1="-15" y1="0" x2="0" y2="0" stroke="#000" stroke-width="2" />
+            <text x="-20" y="0" font-size="16" font-weight="bold" text-anchor="end" dominant-baseline="middle">14</text>
+            <!-- 13 -->
+            <line x1="-15" y1="32.14" x2="0" y2="32.14" stroke="#000" stroke-width="1.5" />
+            <!-- 12 -->
+            <line x1="-15" y1="64.28" x2="0" y2="64.28" stroke="#000" stroke-width="2" />
+            <text x="-20" y="64.28" font-size="16" font-weight="bold" text-anchor="end" dominant-baseline="middle">12</text>
+            <!-- 11 -->
+            <line x1="-15" y1="96.43" x2="0" y2="96.43" stroke="#000" stroke-width="1.5" />
+            <!-- 10 -->
+            <line x1="-15" y1="128.57" x2="0" y2="128.57" stroke="#000" stroke-width="2" />
+            <text x="-20" y="128.57" font-size="16" font-weight="bold" text-anchor="end" dominant-baseline="middle">10</text>
+            <!-- 9 -->
+            <line x1="-15" y1="160.71" x2="0" y2="160.71" stroke="#000" stroke-width="1.5" />
+            <!-- 8 -->
+            <line x1="-15" y1="192.86" x2="0" y2="192.86" stroke="#000" stroke-width="2" />
+            <text x="-20" y="192.86" font-size="16" font-weight="bold" text-anchor="end" dominant-baseline="middle">8</text>
+            <!-- 7 (NEUTRAL - BOLD TICK 40px) -->
+            <line x1="-40" y1="225" x2="0" y2="225" stroke="#000" stroke-width="3.5" />
+            <text x="-48" y="225" font-size="28" font-family="Arial Black, Arial, sans-serif" font-weight="900" text-anchor="end" dominant-baseline="middle">7</text>
+            <!-- 6 -->
+            <line x1="-15" y1="257.14" x2="0" y2="257.14" stroke="#000" stroke-width="2" />
+            <text x="-20" y="257.14" font-size="16" font-weight="bold" text-anchor="end" dominant-baseline="middle">6</text>
+            <!-- 5 -->
+            <line x1="-15" y1="289.28" x2="0" y2="289.28" stroke="#000" stroke-width="1.5" />
+            <!-- 4 -->
+            <line x1="-15" y1="321.43" x2="0" y2="321.43" stroke="#000" stroke-width="2" />
+            <text x="-20" y="321.43" font-size="16" font-weight="bold" text-anchor="end" dominant-baseline="middle">4</text>
+            <!-- 3 -->
+            <line x1="-15" y1="353.57" x2="0" y2="353.57" stroke="#000" stroke-width="1.5" />
+            <!-- 2 -->
+            <line x1="-15" y1="385.71" x2="0" y2="385.71" stroke="#000" stroke-width="2" />
+            <text x="-20" y="385.71" font-size="16" font-weight="bold" text-anchor="end" dominant-baseline="middle">2</text>
+            <!-- 1 -->
+            <line x1="-15" y1="417.86" x2="0" y2="417.86" stroke="#000" stroke-width="1.5" />
+            <!-- 0 -->
+            <line x1="-15" y1="450" x2="0" y2="450" stroke="#000" stroke-width="2" />
+            <text x="-20" y="450" font-size="16" font-weight="bold" text-anchor="end" dominant-baseline="middle">0</text>
+          </g>
+
+          <!-- Movable pH Indicator (Dotted Line & Badge) -->
+          <g id="ph-indicator-group" transform="translate(0, 225)">
+            <line id="indicator-line" x1="0" y1="0" x2="55" y2="0" stroke="#000000" stroke-width="2.5" stroke-dasharray="6,4" />
+            
+            <g id="indicator-badge" transform="translate(62, -32)" filter="url(#btnShadow)">
+              <rect id="badge-bg" width="100" height="64" rx="12" fill="#40006f" stroke="#000000" stroke-width="2" />
+              <rect width="94" height="58" x="3" y="3" rx="9" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" />
+              <text x="50" y="24" fill="#ffffff" font-size="20" font-weight="bold" text-anchor="middle">pH</text>
+              <rect x="12" y="30" width="76" height="26" rx="4" fill="#ffffff" stroke="#333" stroke-width="1" />
+              <text id="badge-val" x="78" y="49" fill="#000000" font-size="20" font-weight="bold" font-family="'Courier New', monospace, sans-serif" text-anchor="end">7.00</text>
+            </g>
+          </g>
+        </g>
+
+        <!-- Cable connects pH meter base (150, 525) to Probe Handle -->
+        <path id="probe-cable" d="M 150,525 C 180,620 220,620 300,580" fill="none" stroke="#4a5568" stroke-width="8" stroke-linecap="round" pointer-events="none" />
+
+        <!-- Draggable pH Probe Target -->
+        <g id="probe-group" transform="translate(300, 580)" cursor="grab" filter="url(#probeShadow)">
+          <!-- Large transparent hit target for effortless grabbing and dragging anywhere on the probe -->
+          <circle cx="0" cy="0" r="38" fill="rgba(0,0,0,0.001)" pointer-events="all" />
+          <rect x="-72" y="-16" width="48" height="32" rx="10" fill="rgba(0,0,0,0.001)" pointer-events="all" />
+          <rect x="-70" y="-12" width="45" height="24" rx="8" fill="#40006f" stroke="#1a0033" stroke-width="2.5" />
+          <rect x="-66" y="-8" width="37" height="8" rx="4" fill="rgba(255,255,255,0.25)" />
+          <circle cx="-62" cy="0" r="5" fill="#2d3748" />
+
+          <circle cx="0" cy="0" r="34" fill="#40006f" stroke="#1a0033" stroke-width="2.5" />
+          <circle cx="0" cy="0" r="26" fill="rgba(255,255,255,0.85)" stroke="#1a0033" stroke-width="2" />
+          
+          <line x1="-26" y1="0" x2="-6" y2="0" stroke="#000000" stroke-width="3" stroke-linecap="round" />
+          <line x1="6" y1="0" x2="26" y2="0" stroke="#000000" stroke-width="3" stroke-linecap="round" />
+          <line x1="0" y1="-26" x2="0" y2="-6" stroke="#000000" stroke-width="3" stroke-linecap="round" />
+          <line x1="0" y1="6" x2="0" y2="26" stroke="#000000" stroke-width="3" stroke-linecap="round" />
+
+          <circle cx="0" cy="0" r="2" fill="#d9534f" />
+        </g>
+      </g>
+
+      <!-- ======================================================================
+           MODE 2: CHEMICAL INDICATOR PAPERS & pH COLOR CHART (VISIBLE IN PAPER MODE)
+           ====================================================================== -->
+      <g id="paper-mode-group" style="display: none;">
+        
+        <!-- CARD 1: BẢNG SO MÀU pH CHUẨN (0 to 14) -->
+        <g id="ph-chart-panel" transform="translate(10, 20)" filter="url(#cardShadow)">
+          <!-- Card Base -->
+          <rect width="170" height="650" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" />
+          
+          <!-- Card Header -->
+          <rect width="170" height="38" rx="12" fill="#1e293b" />
+          <rect y="26" width="170" height="12" fill="#1e293b" />
+          <text x="85" y="24" fill="#ffffff" font-size="12" font-weight="900" text-anchor="middle" letter-spacing="0.5">BẢNG MÀU pH (0 - 14)</text>
+
+          <!-- 15 Color Swatches (pH 14 down to 0) -->
+          <g transform="translate(8, 48)">
+            <rect width="32" height="22" rx="3" fill="#4a148c" stroke="#333" stroke-width="0.8" />
+            <text x="38" y="15" font-size="11.5" font-weight="bold" fill="#0f172a">14</text>
+            <text x="58" y="15" font-size="9.5" fill="#64748b">Tím đen</text>
+          </g>
+          <g transform="translate(8, 75)">
+            <rect width="32" height="22" rx="3" fill="#673ab7" stroke="#333" stroke-width="0.8" />
+            <text x="38" y="15" font-size="11.5" font-weight="bold" fill="#0f172a">13</text>
+            <text x="58" y="15" font-size="9.5" fill="#64748b">Tím đậm</text>
+          </g>
+          <g transform="translate(8, 102)">
+            <rect width="32" height="22" rx="3" fill="#3f51b5" stroke="#333" stroke-width="0.8" />
+            <text x="38" y="15" font-size="11.5" font-weight="bold" fill="#0f172a">12</text>
+            <text x="58" y="15" font-size="9.5" fill="#64748b">Tím lam</text>
+          </g>
+          <g transform="translate(8, 129)">
+            <rect width="32" height="22" rx="3" fill="#1565c0" stroke="#333" stroke-width="0.8" />
+            <text x="38" y="15" font-size="11.5" font-weight="bold" fill="#0f172a">11</text>
+            <text x="58" y="15" font-size="9.5" fill="#64748b">Xanh lam đậm</text>
+          </g>
+          <g transform="translate(8, 156)">
+            <rect width="32" height="22" rx="3" fill="#0288d1" stroke="#333" stroke-width="0.8" />
+            <text x="38" y="15" font-size="11.5" font-weight="bold" fill="#0f172a">10</text>
+            <text x="58" y="15" font-size="9.5" fill="#64748b">Xanh lam</text>
+          </g>
+          <g transform="translate(8, 183)">
+            <rect width="32" height="22" rx="3" fill="#00897b" stroke="#333" stroke-width="0.8" />
+            <text x="38" y="15" font-size="11.5" font-weight="bold" fill="#0f172a">9</text>
+            <text x="58" y="15" font-size="9.5" fill="#64748b">Xanh ngọc</text>
+          </g>
+          <g transform="translate(8, 210)">
+            <rect width="32" height="22" rx="3" fill="#2e7d32" stroke="#333" stroke-width="0.8" />
+            <text x="38" y="15" font-size="11.5" font-weight="bold" fill="#0f172a">8</text>
+            <text x="58" y="15" font-size="9.5" fill="#64748b">Xanh lục thẫm</text>
+          </g>
+          <!-- pH 7 (NEUTRAL - HIGHLIGHTED) -->
+          <g transform="translate(8, 237)">
+            <rect width="32" height="22" rx="3" fill="#4caf50" stroke="#1b5e20" stroke-width="1.8" />
+            <text x="38" y="15" font-size="12" font-weight="900" fill="#2e7d32">7</text>
+            <text x="58" y="15" font-size="10" font-weight="bold" fill="#2e7d32">Trung tính</text>
+          </g>
+          <g transform="translate(8, 264)">
+            <rect width="32" height="22" rx="3" fill="#ffeb3b" stroke="#333" stroke-width="0.8" />
+            <text x="38" y="15" font-size="11.5" font-weight="bold" fill="#0f172a">6</text>
+            <text x="58" y="15" font-size="9.5" fill="#64748b">Vàng chanh</text>
+          </g>
+          <g transform="translate(8, 291)">
+            <rect width="32" height="22" rx="3" fill="#ffb74d" stroke="#333" stroke-width="0.8" />
+            <text x="38" y="15" font-size="11.5" font-weight="bold" fill="#0f172a">5</text>
+            <text x="58" y="15" font-size="9.5" fill="#64748b">Vàng cam</text>
+          </g>
+          <g transform="translate(8, 318)">
+            <rect width="32" height="22" rx="3" fill="#ff9800" stroke="#333" stroke-width="0.8" />
+            <text x="38" y="15" font-size="11.5" font-weight="bold" fill="#0f172a">4</text>
+            <text x="58" y="15" font-size="9.5" fill="#64748b">Cam</text>
+          </g>
+          <g transform="translate(8, 345)">
+            <rect width="32" height="22" rx="3" fill="#ff7043" stroke="#333" stroke-width="0.8" />
+            <text x="38" y="15" font-size="11.5" font-weight="bold" fill="#0f172a">3</text>
+            <text x="58" y="15" font-size="9.5" fill="#64748b">Cam đỏ</text>
+          </g>
+          <g transform="translate(8, 372)">
+            <rect width="32" height="22" rx="3" fill="#f4511e" stroke="#333" stroke-width="0.8" />
+            <text x="38" y="15" font-size="11.5" font-weight="bold" fill="#0f172a">2</text>
+            <text x="58" y="15" font-size="9.5" fill="#64748b">Đỏ cam</text>
+          </g>
+          <g transform="translate(8, 399)">
+            <rect width="32" height="22" rx="3" fill="#d32f2f" stroke="#333" stroke-width="0.8" />
+            <text x="38" y="15" font-size="11.5" font-weight="bold" fill="#0f172a">1</text>
+            <text x="58" y="15" font-size="9.5" fill="#64748b">Đỏ tươi</text>
+          </g>
+          <g transform="translate(8, 426)">
+            <rect width="32" height="22" rx="3" fill="#b71c1c" stroke="#333" stroke-width="0.8" />
+            <text x="38" y="15" font-size="11.5" font-weight="bold" fill="#0f172a">0</text>
+            <text x="58" y="15" font-size="9.5" fill="#64748b">Đỏ thẫm</text>
+          </g>
+
+          <!-- Qualitative Brackets on Right -->
+          <line x1="148" y1="52" x2="148" y2="148" stroke="#1565c0" stroke-width="2.5" />
+          <text x="154" y="100" fill="#1565c0" font-size="9" font-weight="bold" transform="rotate(90 154 100)" text-anchor="middle">BAZƠ MẠNH</text>
+
+          <line x1="148" y1="160" x2="148" y2="230" stroke="#00897b" stroke-width="2.5" />
+          <text x="154" y="195" fill="#00897b" font-size="9" font-weight="bold" transform="rotate(90 154 195)" text-anchor="middle">BAZƠ YẾU</text>
+
+          <line x1="148" y1="270" x2="148" y2="340" stroke="#f57c00" stroke-width="2.5" />
+          <text x="154" y="305" fill="#f57c00" font-size="9" font-weight="bold" transform="rotate(90 154 305)" text-anchor="middle">AXIT YẾU</text>
+
+          <line x1="148" y1="350" x2="148" y2="445" stroke="#b71c1c" stroke-width="2.5" />
+          <text x="154" y="398" fill="#b71c1c" font-size="9" font-weight="bold" transform="rotate(90 154 398)" text-anchor="middle">AXIT MẠNH</text>
+
+          <!-- Indicator Reference Legend at Bottom of Card 1 -->
+          <line x1="8" y1="462" x2="162" y2="462" stroke="#e2e8f0" stroke-width="1.5" />
+          
+          <!-- Litmus Legend -->
+          <g transform="translate(8, 470)">
+            <text x="0" y="11" font-size="10.5" font-weight="bold" fill="#1e293b">Giấy quỳ tím:</text>
+            <rect x="0" y="17" width="16" height="16" rx="3" fill="#e53935" stroke="#333" stroke-width="0.8" />
+            <text x="20" y="30" font-size="10" fill="#b71c1c">Đỏ (Axit)</text>
+            <rect x="76" y="17" width="16" height="16" rx="3" fill="#1565c0" stroke="#333" stroke-width="0.8" />
+            <text x="96" y="30" font-size="10" fill="#0d47a1">Xanh (Bazơ)</text>
+            <text x="0" y="52" font-size="9.5" fill="#64748b">• pH ≈ 7: Giữ màu tím</text>
+          </g>
+
+          <line x1="8" y1="535" x2="162" y2="535" stroke="#e2e8f0" stroke-width="1.5" />
+
+          <!-- Phenolphthalein Legend -->
+          <g transform="translate(8, 545)">
+            <text x="0" y="11" font-size="10.5" font-weight="bold" fill="#1e293b">Giấy Phenolphtalein:</text>
+            <rect x="0" y="17" width="16" height="16" rx="3" fill="#ffffff" stroke="#94a3b8" stroke-width="1" />
+            <text x="20" y="30" font-size="10" fill="#475569">Không màu (pH &lt; 8.3)</text>
+            <rect x="0" y="41" width="16" height="16" rx="3" fill="#e91e63" stroke="#333" stroke-width="0.8" />
+            <text x="20" y="54" font-size="10" fill="#ad1457">Hóa Hồng (pH ≥ 8.3)</text>
+          </g>
+        </g>
+
+        <!-- CARD 2: KHAY ĐỰNG QUE THỬ & BẢNG PHÂN TÍCH QUAN SÁT -->
+        <g id="paper-rack-panel" transform="translate(188, 20)" filter="url(#cardShadow)">
+          <rect width="192" height="650" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+          
+          <!-- Card Header -->
+          <rect width="192" height="38" rx="12" fill="#243342" />
+          <rect y="26" width="192" height="12" fill="#243342" />
+          <text x="96" y="24" fill="#ffffff" font-size="12" font-weight="900" text-anchor="middle" letter-spacing="0.5">KHAY GIẤY CHỈ THỊ</text>
+
+          <!-- Slot Holder Outlines -->
+          <!-- Slot 1: Quỳ tím -->
+          <rect x="10" y="48" width="52" height="215" rx="6" fill="#f1f5f9" stroke="#94a3b8" stroke-dasharray="4,3" stroke-width="1.5" />
+          <text x="36" y="252" font-size="10" font-weight="bold" fill="#64748b" text-anchor="middle">Quỳ tím</text>
+
+          <!-- Slot 2: Phenol -->
+          <rect x="70" y="48" width="52" height="215" rx="6" fill="#f1f5f9" stroke="#94a3b8" stroke-dasharray="4,3" stroke-width="1.5" />
+          <text x="96" y="252" font-size="10" font-weight="bold" fill="#64748b" text-anchor="middle">Phenol</text>
+
+          <!-- Slot 3: Giấy pH -->
+          <rect x="130" y="48" width="52" height="215" rx="6" fill="#f1f5f9" stroke="#94a3b8" stroke-dasharray="4,3" stroke-width="1.5" />
+          <text x="156" y="252" font-size="10" font-weight="bold" fill="#64748b" text-anchor="middle">Giấy pH</text>
+
+          <!-- Control Action Buttons inside Rack -->
+          <!-- Button 1: Reset Test Papers (Lấy giấy mới) -->
+          <g id="btn-fresh-strips" transform="translate(8, 270)" cursor="pointer" filter="url(#btnShadow)">
+            <rect width="84" height="34" rx="6" fill="#334155" />
+            <text x="42" y="21" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle">🔄 Lấy mới</text>
+          </g>
+
+          <!-- Button 2: Auto-Dip Demo (Nhúng thử vào bình) -->
+          <g id="btn-quick-dip" transform="translate(100, 270)" cursor="pointer" filter="url(#btnShadow)">
+            <rect width="84" height="34" rx="6" fill="#00897b" />
+            <text x="42" y="21" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle">💧 Nhúng thử</text>
+          </g>
+
+          <!-- Live Chemical Observation & Analysis Panel -->
+          <g id="strip-analysis-card" transform="translate(8, 316)">
+            <rect width="176" height="320" rx="9" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" />
+            <rect width="176" height="30" rx="9" fill="#e2e8f0" />
+            <rect y="20" width="176" height="10" fill="#e2e8f0" />
+            <text x="88" y="19" font-size="10" font-weight="bold" fill="#334155" text-anchor="middle">KẾT QUẢ QUAN SÁT</text>
+
+            <!-- Current tested solution line -->
+            <text id="live-solute-name" x="8" y="46" font-size="9.5" font-weight="bold" fill="#0284c7">Mẫu: Nước (pH = 7.00)</text>
+
+            <line x1="8" y1="54" x2="168" y2="54" stroke="#f1f5f9" stroke-width="1.5" />
+
+            <!-- 1. Quỳ tím live readout -->
+            <g transform="translate(8, 62)">
+              <text x="0" y="11" font-size="10" font-weight="bold" fill="#1e293b">1. Giấy quỳ tím:</text>
+              <rect id="swatch-litmus-res" x="0" y="16" width="16" height="16" rx="3" fill="#a89bc2" stroke="#333" stroke-width="0.8" />
+              <text id="text-litmus-res" x="22" y="29" font-size="9.5" fill="#475569">Chưa nhúng que thử</text>
+            </g>
+
+            <line x1="8" y1="116" x2="168" y2="116" stroke="#f1f5f9" stroke-width="1.5" />
+
+            <!-- 2. Phenol live readout -->
+            <g transform="translate(8, 124)">
+              <text x="0" y="11" font-size="10" font-weight="bold" fill="#1e293b">2. Phenolphtalein:</text>
+              <rect id="swatch-phenol-res" x="0" y="16" width="16" height="16" rx="3" fill="#ffffff" stroke="#94a3b8" stroke-width="1" />
+              <text id="text-phenol-res" x="22" y="29" font-size="9.5" fill="#475569">Chưa nhúng que thử</text>
+            </g>
+
+            <line x1="8" y1="178" x2="168" y2="178" stroke="#f1f5f9" stroke-width="1.5" />
+
+            <!-- 3. Universal paper live readout -->
+            <g transform="translate(8, 186)">
+              <text x="0" y="11" font-size="10" font-weight="bold" fill="#1e293b">3. Giấy đo pH:</text>
+              <rect id="swatch-univ-res" x="0" y="16" width="16" height="16" rx="3" fill="#fed766" stroke="#333" stroke-width="0.8" />
+              <text id="text-univ-res" x="22" y="29" font-size="9.5" fill="#475569">Chưa nhúng que thử</text>
+            </g>
+
+            <!-- Conclusion Badge Banner at Bottom -->
+            <g id="conclusion-badge-group" transform="translate(8, 256)">
+              <rect id="conclusion-bg" width="160" height="52" rx="8" fill="#4caf50" />
+              <text id="conclusion-title" x="80" y="20" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle">KẾT LUẬN MÔI TRƯỜNG:</text>
+              <text id="conclusion-val" x="80" y="39" fill="#ffffff" font-size="12" font-weight="900" text-anchor="middle">TRUNG TÍNH (pH 7.00)</text>
+            </g>
+          </g>
+        </g>
+
+        <!-- ====================================================================
+             3 DRAGGABLE TEST STRIPS (Interactive Elements)
+             ==================================================================== -->
+<!-- STRIP 1: GIẤY QUỲ TÍM (Litmus Strip) -->
+        <g id="strip-litmus" class="draggable-strip" transform="translate(205, 55)" filter="url(#probeShadow)">
+          <rect x="-4" y="0" width="46" height="34" rx="6" fill="#673ab7" stroke="#4527a0" stroke-width="1.5" />
+          <line x1="2" y1="8" x2="36" y2="8" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-linecap="round" />
+          <line x1="2" y1="12" x2="36" y2="12" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-linecap="round" />
+          <text x="19" y="26" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="middle">QUỲ TÍM</text>
+
+          <rect x="0" y="34" width="38" height="85" fill="#a89bc2" stroke="#64748b" stroke-width="0.8" />
+          <rect id="litmus-paper-tip" x="0" y="119" width="38" height="76" rx="2" fill="#a89bc2" stroke="#64748b" stroke-width="0.8" />
+          <line id="litmus-meniscus" x1="0" y1="119" x2="38" y2="119" stroke="rgba(255,255,255,0.6)" stroke-width="2" style="display: none;" />
+        </g>
+
+        <!-- STRIP 2: GIẤY PHENOLPHTALEIN (Phenol Strip) -->
+        <g id="strip-phenol" class="draggable-strip" transform="translate(265, 55)" filter="url(#probeShadow)">
+          <rect x="-4" y="0" width="46" height="34" rx="6" fill="#c2185b" stroke="#880e4f" stroke-width="1.5" />
+          <line x1="2" y1="8" x2="36" y2="8" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-linecap="round" />
+          <line x1="2" y1="12" x2="36" y2="12" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-linecap="round" />
+          <text x="19" y="26" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="middle">PHENOL</text>
+
+          <rect x="0" y="34" width="38" height="85" fill="#ffffff" stroke="#94a3b8" stroke-width="0.8" />
+          <rect id="phenol-paper-tip" x="0" y="119" width="38" height="76" rx="2" fill="#ffffff" stroke="#94a3b8" stroke-width="0.8" />
+          <line id="phenol-meniscus" x1="0" y1="119" x2="38" y2="119" stroke="rgba(0,0,0,0.15)" stroke-width="2" style="display: none;" />
+        </g>
+
+        <!-- STRIP 3: GIẤY ĐO pH VẠN NĂNG (Universal pH Strip) -->
+        <g id="strip-universal" class="draggable-strip" transform="translate(325, 55)" filter="url(#probeShadow)">
+          <rect x="-4" y="0" width="46" height="34" rx="6" fill="#d97706" stroke="#b45309" stroke-width="1.5" />
+          <line x1="2" y1="8" x2="36" y2="8" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-linecap="round" />
+          <line x1="2" y1="12" x2="36" y2="12" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-linecap="round" />
+          <text x="19" y="26" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="middle">GIẤY pH</text>
+
+          <rect x="0" y="34" width="38" height="85" fill="#fed766" stroke="#b45309" stroke-width="0.8" />
+          <rect id="univ-paper-tip" x="0" y="119" width="38" height="76" rx="2" fill="#fed766" stroke="#b45309" stroke-width="0.8" />
+          <line id="univ-meniscus" x1="0" y1="119" x2="38" y2="119" stroke="rgba(255,255,255,0.6)" stroke-width="2" style="display: none;" />
+        </g>
+
+      </g>
+
+      <!-- ================= 7. SOLUTE COMBO BOX (DROPDOWN TRIGGER) ================= -->
+      <g id="solute-combobox-btn" transform="translate(505, 15)" cursor="pointer" filter="url(#btnShadow)">
+        <rect width="360" height="46" rx="8" fill="#ffffff" stroke="#555555" stroke-width="2.5" />
+        <rect id="combo-swatch" x="14" y="12" width="22" height="22" rx="3" fill="#e0ffff" stroke="#444" stroke-width="1.5" />
+        <text id="combo-title" x="48" y="29" font-size="17" font-weight="bold" fill="#1e2b37">Nước</text>
+        <polygon points="334,20 346,20 340,28" fill="#333333" />
+      </g>
+
+      <!-- ================= 9. RESET ALL BUTTON (BOTTOM RIGHT) ================= -->
+      <g id="reset-all-btn" transform="translate(1040, 640)" cursor="pointer" filter="url(#btnShadow)">
+        <circle id="reset-circle" cx="0" cy="0" r="26" fill="#f57c00" stroke="#d84315" stroke-width="2.5" />
+        <path d="M 9,-10 A 13 13 0 1 0 13,0 L 16,-3 L 13,-9 L 7,-7 L 10,-4 A 9 9 0 1 1 7,-7 Z" fill="#ffffff" />
+      </g>
+    </svg>
+
+    <!-- HTML Solute Dropdown Menu overlaid on top of SVG -->
+    <div id="solute-menu" class="solute-dropdown"></div>
+
+    <!-- Help Modal -->
+    <div id="help-modal">
+      <h3>
+        <span>Hướng dẫn sử dụng phòng thí nghiệm pH</span>
+        <span id="close-modal-x" style="cursor: pointer; font-size: 20px;">✕</span>
+      </h3>
+      <ul>
+        <li><strong>Chuyển đổi chế độ (ở thanh trên cùng):</strong>
+          <br>• <strong>📟 Máy đo pH:</strong> Sử dụng đầu dò điện tử hiển thị giá trị pH số và vạch đo pH trên thanh chỉ thị.
+          <br>• <strong>🧪 Giấy chỉ thị màu:</strong> Sử dụng <em>Giấy quỳ tím</em>, <em>Giấy phenolphtalein</em>, và <em>Giấy đo pH vạn năng</em> kèm <em>Bảng màu pH (0-14)</em>.
+        </li>
+        <li><strong>Thao tác que thử chỉ thị:</strong>
+          <br>• Dùng chuột/ngón tay kéo thả từng que thử vào dung dịch trong bình hoặc dòng chảy vòi nước/ống nhỏ giọt.
+          <br>• Phần ngập trong dung dịch sẽ đổi màu ngay lập tức theo bản chất hóa học!
+          <br>• Đưa que thử pH lại gần <strong>Bảng màu pH</strong> để so sánh và xác định giá trị pH.
+          <br>• Nhấn <strong>🔄 Lấy giấy mới</strong> để làm sạch các que thử hoặc <strong>💧 Nhúng thử</strong> để nhúng nhanh.
+        </li>
+        <li><strong>Chọn dung dịch:</strong> Nhấp vào hộp chọn phía trên để đổi mẫu thí nghiệm (Axit ắc quy, Nước, Máu, Cà phê, Xà phòng...).</li>
+        <li><strong>Ống nhỏ giọt (Dropper):</strong> Nhấn giữ nút trên đỉnh để bơm thêm dung dịch vào bình.</li>
+        <li><strong>Vòi nước & Vòi xả:</strong> Kéo cần gạt sang phải để xả thêm nước pha loãng hoặc xả bớt chất lỏng.</li>
+        <li><strong>Nút Đặt lại:</strong> Nhấn nút màu cam ở góc dưới bên phải để khôi phục trạng thái ban đầu.</li>
+      </ul>
+      <button class="close-btn" id="close-modal-btn">Đã hiểu và Bắt đầu</button>
+    </div>
+  </main>
+
+  <!-- Bottom Navigation Bar (PhET official style) -->
+  <footer id="bottom-bar">
+    <img src="{{LOGO_EDU}}" alt="Edu Logo" class="bottom-edu-logo" title="Edu" />
+    <div id="bottom-title" class="bottom-screen-title">Thang đo pH: phần cơ bản (Máy đo pH)</div>
+  </footer>
+
+  <script>
+    /* ==========================================================================
+       1. DATA & CHEMICAL SIMULATION ENGINE
+       ========================================================================== */
+    const SOLUTIONS = [
+      {
+        id: 'batteryAcid',
+        name: 'Axit ắc quy',
+        nameEn: 'Battery Acid',
+        pH: 1.00,
+        stockColor: [255, 255, 0],
+        colorStopColor: [255, 224, 204],
+        colorStopRatio: 0.25
+      },
+      {
+        id: 'vomit',
+        name: 'Chất nôn / Dịch dạ dày',
+        nameEn: 'Vomit',
+        pH: 2.00,
+        stockColor: [255, 171, 120],
+        colorStopColor: [255, 224, 204],
+        colorStopRatio: 0.25
+      },
+      {
+        id: 'soda',
+        name: 'Soda',
+        nameEn: 'Soda Pop',
+        pH: 2.50,
+        stockColor: [204, 255, 102],
+        colorStopColor: [238, 255, 204],
+        colorStopRatio: 0.25
+      },
+      {
+        id: 'orangeJuice',
+        name: 'Nước cam',
+        nameEn: 'Orange Juice',
+        pH: 3.50,
+        stockColor: [255, 180, 0],
+        colorStopColor: [255, 242, 204],
+        colorStopRatio: 0.25
+      },
+      {
+        id: 'coffee',
+        name: 'Cà phê',
+        nameEn: 'Coffee',
+        pH: 5.00,
+        stockColor: [164, 99, 7],
+        colorStopColor: [255, 240, 204],
+        colorStopRatio: 0.25
+      },
+      {
+        id: 'chickenSoup',
+        name: 'Súp gà',
+        nameEn: 'Chicken Soup',
+        pH: 5.80,
+        stockColor: [255, 240, 104],
+        colorStopColor: [255, 250, 204],
+        colorStopRatio: 0.25
+      },
+      {
+        id: 'milk',
+        name: 'Sữa',
+        nameEn: 'Milk',
+        pH: 6.50,
+        stockColor: [250, 250, 250],
+        colorStopColor: null,
+        colorStopRatio: 0.25
+      },
+      {
+        id: 'water',
+        name: 'Nước',
+        nameEn: 'Water',
+        pH: 7.00,
+        stockColor: [224, 255, 255],
+        colorStopColor: null,
+        colorStopRatio: 0.25
+      },
+      {
+        id: 'spit',
+        name: 'Nước bọt',
+        nameEn: 'Spit',
+        pH: 7.40,
+        stockColor: [202, 240, 239],
+        colorStopColor: null,
+        colorStopRatio: 0.25
+      },
+      {
+        id: 'blood',
+        name: 'Máu',
+        nameEn: 'Blood',
+        pH: 7.40,
+        stockColor: [211, 79, 68],
+        colorStopColor: [255, 207, 204],
+        colorStopRatio: 0.25
+      },
+      {
+        id: 'handSoap',
+        name: 'Xà phòng',
+        nameEn: 'Hand Soap',
+        pH: 10.00,
+        stockColor: [224, 141, 242],
+        colorStopColor: [232, 204, 255],
+        colorStopRatio: 0.25
+      },
+      {
+        id: 'drainCleaner',
+        name: 'Chất tẩy rửa cống',
+        nameEn: 'Drain Cleaner',
+        pH: 13.00,
+        stockColor: [255, 255, 0],
+        colorStopColor: [255, 255, 204],
+        colorStopRatio: 0.25
+      }
+    ];
+
+    // Standard Universal pH Color Chart Palette (0 to 14)
+    const PH_CHART_COLORS = [
+      { ph: 0,  color: [183, 28, 28],   name: 'Đỏ thẫm',       desc: 'Axit rất mạnh' },
+      { ph: 1,  color: [211, 47, 47],   name: 'Đỏ tươi',       desc: 'Axit mạnh' },
+      { ph: 2,  color: [244, 81, 30],   name: 'Đỏ cam',        desc: 'Axit mạnh' },
+      { ph: 3,  color: [255, 112, 67],  name: 'Cam đỏ',        desc: 'Axit mạnh' },
+      { ph: 4,  color: [255, 152, 0],   name: 'Cam',           desc: 'Axit yếu' },
+      { ph: 5,  color: [255, 183, 77],  name: 'Vàng cam',      desc: 'Axit yếu' },
+      { ph: 6,  color: [255, 235, 59],  name: 'Vàng chanh',    desc: 'Axit yếu' },
+      { ph: 7,  color: [76, 175, 80],   name: 'Xanh lá cây',   desc: 'Trung tính' },
+      { ph: 8,  color: [46, 125, 50],   name: 'Xanh lục thẫm', desc: 'Bazơ yếu' },
+      { ph: 9,  color: [0, 137, 123],   name: 'Xanh ngọc',     desc: 'Bazơ yếu' },
+      { ph: 10, color: [2, 136, 209],   name: 'Xanh lam',      desc: 'Bazơ' },
+      { ph: 11, color: [21, 101, 192],  name: 'Xanh lam đậm',  desc: 'Bazơ mạnh' },
+      { ph: 12, color: [63, 81, 181],   name: 'Tím lam',       desc: 'Bazơ mạnh' },
+      { ph: 13, color: [103, 58, 183],  name: 'Tím',           desc: 'Bazơ rất mạnh' },
+      { ph: 14, color: [74, 20, 140],   name: 'Tím đen',       desc: 'Bazơ rất mạnh' }
+    ];
+
+    const WATER_COLOR = [224, 255, 255]; // rgb(224, 255, 255)
+    const MAX_BEAKER_VOLUME = 1.20;     // Liters
+    const BEAKER_BOTTOM_Y = 580;
+    const BEAKER_HEIGHT_PX = 300;       // Corresponds to 1.20 L (250 px / 1.0 L)
+
+    // Simulation Global State
+    const state = {
+      mode: 'meter', // 'meter' or 'paper'
+      currentSolute: SOLUTIONS.find(s => s.id === 'water'),
+      soluteVolume: 0.50, // Liters
+      waterVolume: 0.00,  // Liters
+      waterFaucetFlow: 0, // 0 to 1
+      drainFaucetFlow: 0, // 0 to 1
+      isDropperPressed: false,
+      dropperDispensing: false,
+      probe: {
+        x: 300,
+        y: 580,
+        isDragging: false,
+        measuredPH: 7.00
+      },
+      isSoundEnabled: true
+    };
+
+    // Indicator Paper Strips State
+    const STRIP_DEFAULT_POS = {
+      litmus: { x: 205, y: 55 },
+      phenol: { x: 265, y: 55 },
+      universal: { x: 325, y: 55 }
+    };
+
+    const stripsState = {
+      litmus: {
+        id: 'litmus',
+        name: 'Giấy quỳ tím',
+        x: STRIP_DEFAULT_POS.litmus.x,
+        y: STRIP_DEFAULT_POS.litmus.y,
+        isDragging: false,
+        dipped: false,
+        dippedColor: [168, 155, 194], // dry purple-grey
+        baseDryColor: [168, 155, 194],
+        reactionText: 'Chưa nhúng que thử',
+        reactionDesc: 'Môi trường: Chưa xác định'
+      },
+      phenol: {
+        id: 'phenol',
+        name: 'Giấy phenolphtalein',
+        x: STRIP_DEFAULT_POS.phenol.x,
+        y: STRIP_DEFAULT_POS.phenol.y,
+        isDragging: false,
+        dipped: false,
+        dippedColor: [255, 255, 255], // dry white
+        baseDryColor: [255, 255, 255],
+        reactionText: 'Chưa nhúng que thử',
+        reactionDesc: 'Môi trường: Chưa xác định'
+      },
+      universal: {
+        id: 'universal',
+        name: 'Giấy đo pH vạn năng',
+        x: STRIP_DEFAULT_POS.universal.x,
+        y: STRIP_DEFAULT_POS.universal.y,
+        isDragging: false,
+        dipped: false,
+        dippedColor: [254, 215, 102], // dry straw yellow
+        baseDryColor: [254, 215, 102],
+        reactionText: 'Chưa nhúng que thử',
+        reactionDesc: 'Môi trường: Chưa xác định'
+      }
+    };
+
+    // Helper: Linear RGB Interpolation
+    function interpolateRGB(c1, c2, ratio) {
+      ratio = Math.max(0, Math.min(1, ratio));
+      return [
+        Math.round(c1[0] + (c2[0] - c1[0]) * ratio),
+        Math.round(c1[1] + (c2[1] - c1[1]) * ratio),
+        Math.round(c1[2] + (c2[2] - c1[2]) * ratio)
+      ];
+    }
+
+    // Universal pH Indicator Color Interpolation
+    function getUniversalColor(pH) {
+      if (pH === null || isNaN(pH)) return [254, 215, 102];
+      const clamped = Math.max(0, Math.min(14, pH));
+      const idx = Math.floor(clamped);
+      const frac = clamped - idx;
+      if (idx >= 14) return PH_CHART_COLORS[14].color;
+      return interpolateRGB(PH_CHART_COLORS[idx].color, PH_CHART_COLORS[idx + 1].color, frac);
+    }
+
+    // Litmus Paper Color Calculation
+    function getLitmusReaction(pH) {
+      if (pH === null || isNaN(pH)) {
+        return {
+          color: [168, 155, 194],
+          text: 'Chưa nhúng que thử',
+          desc: 'Chưa xác định'
+        };
+      }
+      if (pH < 5.0) {
+        return {
+          color: [229, 57, 53], // Strong Red
+          text: 'Hóa ĐỎ rực rỡ',
+          desc: 'Môi trường Axit mạnh (pH < 5)'
+        };
+      } else if (pH < 6.5) {
+        const c = interpolateRGB([229, 57, 53], [142, 124, 195], (pH - 5.0) / 1.5);
+        return {
+          color: c,
+          text: 'Hóa Đỏ cam nhạt',
+          desc: 'Môi trường Axit yếu (5 ≤ pH < 6.5)'
+        };
+      } else if (pH <= 7.5) {
+        return {
+          color: [142, 124, 195], // Neutral Violet
+          text: 'Giữ màu TÍM nguyên bản',
+          desc: 'Môi trường Trung tính (pH ≈ 7)'
+        };
+      } else if (pH <= 9.0) {
+        const c = interpolateRGB([142, 124, 195], [30, 136, 229], (pH - 7.5) / 1.5);
+        return {
+          color: c,
+          text: 'Hóa Xanh lam nhạt',
+          desc: 'Môi trường Bazơ yếu (7.5 < pH ≤ 9)'
+        };
+      } else {
+        return {
+          color: [21, 101, 192], // Deep Royal Blue
+          text: 'Hóa XANH lam đậm',
+          desc: 'Môi trường Bazơ mạnh (pH > 9)'
+        };
+      }
+    }
+
+    // Phenolphthalein Color Calculation
+    function getPhenolReaction(pH) {
+      if (pH === null || isNaN(pH)) {
+        return {
+          color: [255, 255, 255],
+          text: 'Chưa nhúng que thử',
+          desc: 'Chưa xác định'
+        };
+      }
+      if (pH < 8.2) {
+        return {
+          color: [255, 255, 255], // Colorless / White
+          text: 'Không đổi màu (Không màu)',
+          desc: 'Môi trường Axit hoặc Trung tính (pH < 8.3)'
+        };
+      } else if (pH < 9.8) {
+        const c = interpolateRGB([255, 255, 255], [233, 30, 99], (pH - 8.2) / 1.6);
+        return {
+          color: c,
+          text: 'Hóa HỒNG nhạt',
+          desc: 'Môi trường Bazơ / Kiềm (8.3 ≤ pH < 10)'
+        };
+      } else {
+        return {
+          color: [216, 27, 96], // Vivid Magenta Pink
+          text: 'Hóa HỒNG ĐẬM / Cánh sen',
+          desc: 'Môi trường Bazơ / Kiềm mạnh (pH ≥ 10)'
+        };
+      }
+    }
+
+    // Universal pH Strip Readout
+    function getUniversalReaction(pH) {
+      if (pH === null || isNaN(pH)) {
+        return {
+          color: [254, 215, 102],
+          text: 'Chưa nhúng que thử',
+          desc: 'Chưa xác định'
+        };
+      }
+      const c = getUniversalColor(pH);
+      const nearestIdx = Math.max(0, Math.min(14, Math.round(pH)));
+      const info = PH_CHART_COLORS[nearestIdx];
+      return {
+        color: c,
+        text: 'Đổi màu: ' + info.name + ' (pH ≈ ' + pH.toFixed(1) + ')',
+        desc: 'So bảng màu: ' + info.desc
+      };
+    }
+
+    // PhET Dilution Color Model
+    function getSolutionColor(solute, solVol, watVol) {
+      const total = solVol + watVol;
+      if (total <= 0.0001) return solute.stockColor;
+      if (watVol <= 0.0001) return solute.stockColor;
+      if (solVol <= 0.0001) return WATER_COLOR;
+      
+      const ratio = solVol / total;
+      if (solute.colorStopColor) {
+        const stop = solute.colorStopRatio || 0.25;
+        if (ratio > stop) {
+          return interpolateRGB(solute.colorStopColor, solute.stockColor, (ratio - stop) / (1 - stop));
+        } else {
+          return interpolateRGB(WATER_COLOR, solute.colorStopColor, ratio / stop);
+        }
+      } else {
+        return interpolateRGB(WATER_COLOR, solute.stockColor, ratio);
+      }
+    }
+
+    // Exact PhET Chemical Dilution Formula
+    function computePH(solutePH, solVol, watVol) {
+      const total = solVol + watVol;
+      if (total <= 0.0001) return null;
+      if (watVol <= 0.00001) return solutePH;
+      if (solVol <= 0.00001) return 7.00;
+      
+      let res;
+      if (solutePH < 7) {
+        // Acid dilution: [H+] = (10^-pH * V_sol + 10^-7 * V_wat) / V_tot
+        const hConc = (Math.pow(10, -solutePH) * solVol + Math.pow(10, -7) * watVol) / total;
+        res = -Math.log10(hConc);
+      } else {
+        // Base dilution: [OH-] = (10^(pH-14) * V_sol + 10^(7-14) * V_wat) / V_tot
+        const ohConc = (Math.pow(10, solutePH - 14) * solVol + Math.pow(10, -7) * watVol) / total;
+        res = 14 + Math.log10(ohConc);
+      }
+      return Math.max(0, Math.min(14, res));
+    }
+
+    /* ==========================================================================
+       2. PROCEDURAL WEB AUDIO SYNTHESIZER
+       ========================================================================== */
+    class AudioEngine {
+      constructor() {
+        this.ctx = null;
+        this.waterGain = null;
+        this.waterFilter = null;
+        this.waterNoise = null;
+        this.drainGain = null;
+        this.drainFilter = null;
+        this.drainNoise = null;
+      }
+      init() {
+        if (this.ctx) return;
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        this.ctx = new AudioCtx();
+
+        // Water stream pink/white noise loop
+        const bufferSize = this.ctx.sampleRate * 2;
+        const noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const output = noiseBuffer.getChannelData(0);
+        let b0 = 0, b1 = 0, b2 = 0;
+        for (let i = 0; i < bufferSize; i++) {
+          const white = Math.random() * 2 - 1;
+          b0 = 0.99886 * b0 + white * 0.0555179;
+          b1 = 0.99332 * b1 + white * 0.0750759;
+          b2 = 0.96900 * b2 + white * 0.1538520;
+          output[i] = (b0 + b1 + b2 + white * 0.5362) * 0.11;
+        }
+
+        // Faucet source
+        this.waterNoise = this.ctx.createBufferSource();
+        this.waterNoise.buffer = noiseBuffer;
+        this.waterNoise.loop = true;
+
+        this.waterFilter = this.ctx.createBiquadFilter();
+        this.waterFilter.type = 'bandpass';
+        this.waterFilter.frequency.value = 850;
+        this.waterFilter.Q.value = 2.0;
+
+        this.waterGain = this.ctx.createGain();
+        this.waterGain.gain.value = 0;
+
+        this.waterNoise.connect(this.waterFilter);
+        this.waterFilter.connect(this.waterGain);
+        this.waterGain.connect(this.ctx.destination);
+        this.waterNoise.start(0);
+
+        // Drain source
+        this.drainNoise = this.ctx.createBufferSource();
+        this.drainNoise.buffer = noiseBuffer;
+        this.drainNoise.loop = true;
+
+        this.drainFilter = this.ctx.createBiquadFilter();
+        this.drainFilter.type = 'lowpass';
+        this.drainFilter.frequency.value = 450;
+
+        this.drainGain = this.ctx.createGain();
+        this.drainGain.gain.value = 0;
+
+        this.drainNoise.connect(this.drainFilter);
+        this.drainFilter.connect(this.drainGain);
+        this.drainGain.connect(this.ctx.destination);
+        this.drainNoise.start(0);
+      }
+
+      setWaterFlow(rate) {
+        if (!state.isSoundEnabled || !this.ctx) return;
+        this.waterGain.gain.setTargetAtTime(rate * 0.35, this.ctx.currentTime, 0.05);
+        this.waterFilter.frequency.setTargetAtTime(700 + rate * 600, this.ctx.currentTime, 0.05);
+      }
+
+      setDrainFlow(rate) {
+        if (!state.isSoundEnabled || !this.ctx) return;
+        this.drainGain.gain.setTargetAtTime(rate * 0.28, this.ctx.currentTime, 0.05);
+      }
+
+      playDrip() {
+        if (!state.isSoundEnabled || !this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const now = this.ctx.currentTime;
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600 + Math.random() * 200, now);
+        osc.frequency.exponentialRampToValueAtTime(1200 + Math.random() * 400, now + 0.08);
+
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.1);
+      }
+
+      playPop() {
+        if (!state.isSoundEnabled || !this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const now = this.ctx.currentTime;
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.exponentialRampToValueAtTime(220, now + 0.06);
+
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.07);
+      }
+
+      playDip() {
+        if (!state.isSoundEnabled || !this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const now = this.ctx.currentTime;
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(750, now);
+        osc.frequency.exponentialRampToValueAtTime(320, now + 0.11);
+
+        gain.gain.setValueAtTime(0.22, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.13);
+      }
+
+      playModeSwitch() {
+        if (!state.isSoundEnabled || !this.ctx) return;
+        const now = this.ctx.currentTime;
+        [587.33, 880.00].forEach((freq, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.value = freq;
+          gain.gain.setValueAtTime(0.12, now + idx * 0.06);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.06 + 0.18);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + idx * 0.06);
+          osc.stop(now + idx * 0.06 + 0.19);
+        });
+      }
+
+      playReset() {
+        if (!state.isSoundEnabled || !this.ctx) return;
+        const now = this.ctx.currentTime;
+        [523.25, 659.25, 783.99].forEach((freq, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.value = freq;
+          gain.gain.setValueAtTime(0.12, now + idx * 0.04);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.04 + 0.25);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + idx * 0.04);
+          osc.stop(now + idx * 0.04 + 0.26);
+        });
+      }
+    }
+    const audio = new AudioEngine();
+
+    /* ==========================================================================
+       3. DOM ELEMENTS & SVG BINDINGS
+       ========================================================================== */
+    const svg = document.getElementById('sim-svg');
+    const simContainer = document.getElementById('sim-container');
+    const soluteMenu = document.getElementById('solute-menu');
+    const comboBtn = document.getElementById('solute-combobox-btn');
+    const comboSwatch = document.getElementById('combo-swatch');
+    const comboTitle = document.getElementById('combo-title');
+
+    // Mode Switcher Elements
+    const modeMeterBtn = document.getElementById('mode-meter-btn');
+    const modePaperBtn = document.getElementById('mode-paper-btn');
+    const meterModeGroup = document.getElementById('meter-mode-group');
+    const paperModeGroup = document.getElementById('paper-mode-group');
+    const bottomTitle = document.getElementById('bottom-title');
+
+    // Beaker & Liquid
+    const liquidBody = document.getElementById('liquid-body');
+    const liquidSurfaceLine = document.getElementById('liquid-surface-line');
+    const liquidWaves = document.getElementById('liquid-waves');
+    const neutralBadge = document.getElementById('neutral-badge');
+    const volumeIndicator = document.getElementById('volume-indicator');
+    const volumeText = document.getElementById('volume-text');
+
+    // Dropper
+    const dropperFluid = document.getElementById('dropper-fluid');
+    const dropperBtn = document.getElementById('dropper-btn-group');
+    const dropperBtnImgNorm = document.getElementById('dropper-btn-img-norm');
+    const dropperBtnImgPress = document.getElementById('dropper-btn-img-press');
+    const dropperStream = document.getElementById('dropper-stream-group');
+    const dropperStreamRect = document.getElementById('dropper-stream-rect');
+    const dropperSplash = document.getElementById('dropper-splash');
+
+    // Faucets
+    const waterShooter = document.getElementById('water-shooter-group');
+    const waterKnob = document.getElementById('water-slider-knob');
+    const waterStream = document.getElementById('water-stream-group');
+    const waterStreamRect = document.getElementById('water-stream-rect');
+    const waterSplash = document.getElementById('water-splash');
+    const drainShooter = document.getElementById('drain-shooter-group');
+    const drainKnob = document.getElementById('drain-slider-knob');
+    const drainStream = document.getElementById('drain-stream-group');
+    const drainStreamRect = document.getElementById('drain-stream-rect');
+
+    function setWaterFaucetFlow(flow) {
+      state.waterFaucetFlow = Math.max(0, Math.min(1, flow));
+      const shooterX = -107.5 + state.waterFaucetFlow * 62;
+      waterShooter.setAttribute('transform', 'translate(' + shooterX + ', -194)');
+      audio.setWaterFlow(state.waterFaucetFlow);
+    }
+
+    function setDrainFaucetFlow(flow) {
+      state.drainFaucetFlow = Math.max(0, Math.min(1, flow));
+      const shooterX = -107.5 + state.drainFaucetFlow * 62;
+      drainShooter.setAttribute('transform', 'translate(' + shooterX + ', -179)');
+      audio.setDrainFlow(state.drainFaucetFlow);
+    }
+
+    // Mode 1: pH Scale & Indicator
+    const phIndicatorGroup = document.getElementById('ph-indicator-group');
+    const badgeBg = document.getElementById('badge-bg');
+    const badgeVal = document.getElementById('badge-val');
+    const indicatorLine = document.getElementById('indicator-line');
+    const probeGroup = document.getElementById('probe-group');
+    const probeCable = document.getElementById('probe-cable');
+
+    // Mode 2: Test Strips DOM Elements
+    const stripLitmus = document.getElementById('strip-litmus');
+    const stripPhenol = document.getElementById('strip-phenol');
+    const stripUniversal = document.getElementById('strip-universal');
+
+    const litmusPaperTip = document.getElementById('litmus-paper-tip');
+    const phenolPaperTip = document.getElementById('phenol-paper-tip');
+    const univPaperTip = document.getElementById('univ-paper-tip');
+
+    const litmusMeniscus = document.getElementById('litmus-meniscus');
+    const phenolMeniscus = document.getElementById('phenol-meniscus');
+    const univMeniscus = document.getElementById('univ-meniscus');
+
+    // Mode 2: Observation Panel Readouts
+    const liveSoluteName = document.getElementById('live-solute-name');
+    const swatchLitmusRes = document.getElementById('swatch-litmus-res');
+    const textLitmusRes = document.getElementById('text-litmus-res');
+    const swatchPhenolRes = document.getElementById('swatch-phenol-res');
+    const textPhenolRes = document.getElementById('text-phenol-res');
+    const swatchUnivRes = document.getElementById('swatch-univ-res');
+    const textUnivRes = document.getElementById('text-univ-res');
+
+    const conclusionBg = document.getElementById('conclusion-bg');
+    const conclusionVal = document.getElementById('conclusion-val');
+
+    // Buttons
+    const btnFreshStrips = document.getElementById('btn-fresh-strips');
+    const btnQuickDip = document.getElementById('btn-quick-dip');
+    const resetBtn = document.getElementById('reset-all-btn');
+    const resetCircle = document.getElementById('reset-circle');
+
+    // Top Controls
+    const btnSound = document.getElementById('btn-sound');
+    const soundIcon = document.getElementById('sound-icon');
+    const btnHelp = document.getElementById('btn-help');
+    const helpModal = document.getElementById('help-modal');
+    const closeModalX = document.getElementById('close-modal-x');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const btnFullscreen = document.getElementById('btn-fullscreen');
+
+    /* Coordinate Conversion Helper */
+    function getSvgCoordinates(evt) {
+      const pt = svg.createSVGPoint();
+      pt.x = evt.clientX;
+      pt.y = evt.clientY;
+      return pt.matrixTransform(svg.getScreenCTM().inverse());
+    }
+
+    /* Populate Solute Dropdown */
+    function buildDropdown() {
+      soluteMenu.innerHTML = '';
+      SOLUTIONS.forEach(sol => {
+        const item = document.createElement('div');
+        item.className = 'dropdown-item' + (sol.id === state.currentSolute.id ? ' active' : '');
+        item.innerHTML = 
+          '<div class="color-swatch" style="background-color: rgb(' + sol.stockColor.join(',') + ');"></div>' +
+          '<span style="font-weight: 500;">' + sol.name + '</span>' +
+          '<span class="dropdown-item-ph">pH ' + sol.pH.toFixed(2) + '</span>';
+        item.addEventListener('click', () => {
+          selectSolution(sol);
+          closeDropdown();
+        });
+        soluteMenu.appendChild(item);
+      });
+    }
+    buildDropdown();
+
+    function positionDropdown() {
+      const rect = comboBtn.getBoundingClientRect();
+      const parentRect = simContainer.getBoundingClientRect();
+      soluteMenu.style.left = (rect.left - parentRect.left) + 'px';
+      soluteMenu.style.top = (rect.bottom - parentRect.top + 4) + 'px';
+      soluteMenu.style.width = rect.width + 'px';
+    }
+
+    function toggleDropdown() {
+      audio.init();
+      audio.playPop();
+      if (soluteMenu.style.display === 'block') {
+        closeDropdown();
+      } else {
+        buildDropdown();
+        positionDropdown();
+        soluteMenu.style.display = 'block';
+      }
+    }
+
+    function closeDropdown() {
+      soluteMenu.style.display = 'none';
+    }
+
+    function selectSolution(sol) {
+      audio.init();
+      audio.playPop();
+      state.currentSolute = sol;
+      // Per PhET: selecting a new solution refills beaker with 0.50 L of this solute
+      state.soluteVolume = 0.50;
+      state.waterVolume = 0.00;
+
+      // In Paper Mode: If strips are currently sitting in beaker, update their reactions
+      updateStripsSense();
+      updateUI();
+    }
+
+    comboBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleDropdown();
+    });
+
+    window.addEventListener('click', () => {
+      closeDropdown();
+    });
+    window.addEventListener('resize', () => {
+      if (soluteMenu.style.display === 'block') positionDropdown();
+    });
+
+    /* ==========================================================================
+       4. MODE SWITCHER LOGIC
+       ========================================================================== */
+    function setSimulationMode(mode) {
+      if (state.mode === mode) return;
+      audio.init();
+      audio.playModeSwitch();
+      state.mode = mode;
+
+      if (mode === 'meter') {
+        modeMeterBtn.classList.add('active');
+        modePaperBtn.classList.remove('active');
+        meterModeGroup.style.display = 'inline';
+        paperModeGroup.style.display = 'none';
+        bottomTitle.textContent = 'Thang đo pH: phần cơ bản (Máy đo pH)';
+      } else {
+        modePaperBtn.classList.add('active');
+        modeMeterBtn.classList.remove('active');
+        meterModeGroup.style.display = 'none';
+        paperModeGroup.style.display = 'inline';
+        bottomTitle.textContent = 'Thang đo pH: phần cơ bản (Giấy chỉ thị màu)';
+        
+        // Render paper mode state immediately
+        updateStripsSense();
+        renderPaperMode();
+      }
+      updateUI();
+    }
+
+    modeMeterBtn.addEventListener('click', () => setSimulationMode('meter'));
+    modePaperBtn.addEventListener('click', () => setSimulationMode('paper'));
+
+    if (new URLSearchParams(window.location.search).get('mode') === 'paper') {
+      setSimulationMode('paper');
+    }
+
+    /* ==========================================================================
+       5. INTERACTION HANDLERS (POINTER EVENTS)
+       ========================================================================== */
+
+    /* 5.1 Dropper Push Button */
+    function startDispensing() {
+      audio.init();
+      state.isDropperPressed = true;
+      dropperBtnImgNorm.style.display = 'none';
+      dropperBtnImgPress.style.display = 'block';
+    }
+    function stopDispensing() {
+      state.isDropperPressed = false;
+      dropperBtnImgNorm.style.display = 'block';
+      dropperBtnImgPress.style.display = 'none';
+    }
+
+    dropperBtn.addEventListener('pointerdown', (e) => {
+      e.stopPropagation();
+      dropperBtn.setPointerCapture(e.pointerId);
+      startDispensing();
+    });
+    dropperBtn.addEventListener('pointerup', stopDispensing);
+    dropperBtn.addEventListener('pointercancel', stopDispensing);
+
+    /* 5.2 Water Faucet Slider Knob */
+    let waterSliderDragging = false;
+    let waterSliderStartX = 0;
+    let waterSliderInitialFlow = 0;
+
+    waterKnob.addEventListener('pointerdown', (e) => {
+      e.stopPropagation();
+      audio.init();
+      waterKnob.setPointerCapture(e.pointerId);
+      waterSliderDragging = true;
+      const coords = getSvgCoordinates(e);
+      waterSliderStartX = coords.x;
+      waterSliderInitialFlow = state.waterFaucetFlow;
+      if (state.waterFaucetFlow === 0) {
+        setWaterFaucetFlow(0.5);
+        waterSliderInitialFlow = 0.5;
+      }
+    });
+
+    /* 5.3 Drain Faucet Slider Knob */
+    let drainSliderDragging = false;
+    let drainSliderStartX = 0;
+    let drainSliderInitialFlow = 0;
+
+    drainKnob.addEventListener('pointerdown', (e) => {
+      e.stopPropagation();
+      audio.init();
+      drainKnob.setPointerCapture(e.pointerId);
+      drainSliderDragging = true;
+      const coords = getSvgCoordinates(e);
+      drainSliderStartX = coords.x;
+      drainSliderInitialFlow = state.drainFaucetFlow;
+      if (state.drainFaucetFlow === 0) {
+        setDrainFaucetFlow(0.5);
+        drainSliderInitialFlow = 0.5;
+      }
+    });
+
+    /* 5.4 Mode 1: Draggable pH Probe */
+    let probeDragOffsetX = 0;
+    let probeDragOffsetY = 0;
+
+    probeGroup.addEventListener('pointerdown', (e) => {
+      e.stopPropagation();
+      audio.init();
+      audio.playPop();
+      try {
+        probeGroup.setPointerCapture(e.pointerId);
+      } catch (err) {}
+      state.probe.isDragging = true;
+      probeGroup.setAttribute('cursor', 'grabbing');
+      const coords = getSvgCoordinates(e);
+      probeDragOffsetX = coords.x - state.probe.x;
+      probeDragOffsetY = coords.y - state.probe.y;
+    });
+
+    probeGroup.addEventListener('pointerup', (e) => {
+      if (state.probe.isDragging) {
+        state.probe.isDragging = false;
+        probeGroup.setAttribute('cursor', 'grab');
+        try {
+          if (probeGroup.hasPointerCapture(e.pointerId)) {
+            probeGroup.releasePointerCapture(e.pointerId);
+          }
+        } catch (err) {}
+      }
+    });
+
+    /* 5.5 Mode 2: Draggable Test Strips Handlers */
+    let activeDragStrip = null;
+    let stripDragOffsetX = 0;
+    let stripDragOffsetY = 0;
+
+    function setupStripDrag(stripEl, stripKey) {
+      stripEl.addEventListener('pointerdown', (e) => {
+        e.stopPropagation();
+        audio.init();
+        audio.playPop();
+        stripEl.setPointerCapture(e.pointerId);
+        activeDragStrip = stripsState[stripKey];
+        activeDragStrip.isDragging = true;
+
+        // Bring dragged strip to front of paper group
+        paperModeGroup.appendChild(stripEl);
+
+        const coords = getSvgCoordinates(e);
+        stripDragOffsetX = coords.x - activeDragStrip.x;
+        stripDragOffsetY = coords.y - activeDragStrip.y;
+      });
+    }
+
+    setupStripDrag(stripLitmus, 'litmus');
+    setupStripDrag(stripPhenol, 'phenol');
+    setupStripDrag(stripUniversal, 'universal');
+
+    // Global Pointer Move
+    window.addEventListener('pointermove', (e) => {
+      if (waterSliderDragging) {
+        const coords = getSvgCoordinates(e);
+        const dx = coords.x - waterSliderStartX;
+        const dFlow = -dx / 37.2;
+        setWaterFaucetFlow(waterSliderInitialFlow + dFlow);
+      } else if (drainSliderDragging) {
+        const coords = getSvgCoordinates(e);
+        const dx = coords.x - drainSliderStartX;
+        const dFlow = -dx / 37.2;
+        setDrainFaucetFlow(drainSliderInitialFlow + dFlow);
+      } else if (state.probe.isDragging) {
+        const coords = getSvgCoordinates(e);
+        state.probe.x = Math.max(34, Math.min(1066, coords.x - probeDragOffsetX));
+        state.probe.y = Math.max(34, Math.min(666, coords.y - probeDragOffsetY));
+        updateProbeView();
+        updateUI();
+      } else if (activeDragStrip && activeDragStrip.isDragging) {
+        const coords = getSvgCoordinates(e);
+        activeDragStrip.x = Math.max(10, Math.min(1040, coords.x - stripDragOffsetX));
+        activeDragStrip.y = Math.max(10, Math.min(500, coords.y - stripDragOffsetY));
+        updateStripView(activeDragStrip);
+        updateStripsSense();
+      }
+    });
+
+    // Global Pointer Up & Pointer Cancel
+    function finishAllDragging(e) {
+      if (waterSliderDragging) {
+        waterSliderDragging = false;
+        setWaterFaucetFlow(0);
+      }
+      if (drainSliderDragging) {
+        drainSliderDragging = false;
+        setDrainFaucetFlow(0);
+      }
+      if (state.probe.isDragging) {
+        state.probe.isDragging = false;
+        probeGroup.setAttribute('cursor', 'grab');
+        try {
+          if (e && e.pointerId && probeGroup.hasPointerCapture(e.pointerId)) {
+            probeGroup.releasePointerCapture(e.pointerId);
+          }
+        } catch (err) {}
+        audio.playPop();
+      }
+      if (activeDragStrip && activeDragStrip.isDragging) {
+        activeDragStrip.isDragging = false;
+        try {
+          if (e && e.pointerId && e.target && e.target.hasPointerCapture && e.target.hasPointerCapture(e.pointerId)) {
+            e.target.releasePointerCapture(e.pointerId);
+          }
+        } catch (err) {}
+        audio.playPop();
+        activeDragStrip = null;
+      }
+    }
+
+    window.addEventListener('pointerup', finishAllDragging);
+    window.addEventListener('pointercancel', finishAllDragging);
+
+    /* Update SVG Position of a Test Strip */
+    function updateStripView(strip) {
+      const el = strip.id === 'litmus' ? stripLitmus : (strip.id === 'phenol' ? stripPhenol : stripUniversal);
+      el.setAttribute('transform', 'translate(' + strip.x + ', ' + strip.y + ')');
+    }
+
+    /* Reset All Test Strips Back to Clean / Dry State */
+    function resetAllStrips() {
+      audio.init();
+      audio.playReset();
+      Object.keys(stripsState).forEach(k => {
+        const s = stripsState[k];
+        s.x = STRIP_DEFAULT_POS[k].x;
+        s.y = STRIP_DEFAULT_POS[k].y;
+        s.dipped = false;
+        s.dippedColor = [...s.baseDryColor];
+        s.reactionText = 'Chưa nhúng que thử';
+        s.reactionDesc = 'Môi trường: Chưa xác định';
+        updateStripView(s);
+      });
+      renderPaperMode();
+    }
+
+    btnFreshStrips.addEventListener('click', (e) => {
+      e.stopPropagation();
+      resetAllStrips();
+    });
+
+    /* Auto-Dip Demonstration into Beaker */
+    let isQuickDipping = false;
+    function autoDipStrips() {
+      if (isQuickDipping) return;
+      isQuickDipping = true;
+      audio.init();
+      audio.playDip();
+
+      const targetY = 360;
+
+      // Move strips into beaker center area
+      stripsState.litmus.x = 600;
+      stripsState.litmus.y = targetY;
+      stripsState.phenol.x = 680;
+      stripsState.phenol.y = targetY;
+      stripsState.universal.x = 760;
+      stripsState.universal.y = targetY;
+
+      Object.values(stripsState).forEach(updateStripView);
+      updateStripsSense();
+
+      // Lift back out after 900ms and arrange for comparison
+      setTimeout(() => {
+        audio.playPop();
+        stripsState.litmus.x = STRIP_DEFAULT_POS.litmus.x;
+        stripsState.litmus.y = 80;
+        stripsState.phenol.x = STRIP_DEFAULT_POS.phenol.x;
+        stripsState.phenol.y = 80;
+        stripsState.universal.x = STRIP_DEFAULT_POS.universal.x;
+        stripsState.universal.y = 80;
+        Object.values(stripsState).forEach(updateStripView);
+        isQuickDipping = false;
+      }, 950);
+    }
+
+    btnQuickDip.addEventListener('click', (e) => {
+      e.stopPropagation();
+      autoDipStrips();
+    });
+
+    /* 5.6 Reset All Button (Bottom Right) */
+    resetBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      audio.init();
+      audio.playReset();
+      resetCircle.setAttribute('fill', '#e65100');
+      setTimeout(() => resetCircle.setAttribute('fill', '#f57c00'), 150);
+
+      // Reset Chemical Liquids
+      state.currentSolute = SOLUTIONS.find(s => s.id === 'water');
+      state.soluteVolume = 0.50;
+      state.waterVolume = 0.00;
+      state.isDropperPressed = false;
+      setWaterFaucetFlow(0);
+      setDrainFaucetFlow(0);
+
+      // Reset Mode 1 Probe
+      state.probe.x = 300;
+      state.probe.y = 580;
+
+      // Reset Mode 2 Strips
+      resetAllStrips();
+
+      updateUI();
+    });
+
+    /* 5.7 Header Button Handlers */
+    btnSound.addEventListener('click', () => {
+      audio.init();
+      state.isSoundEnabled = !state.isSoundEnabled;
+      if (state.isSoundEnabled) {
+        soundIcon.textContent = '🔊';
+        btnSound.title = 'Tắt âm thanh';
+      } else {
+        soundIcon.textContent = '🔇';
+        btnSound.title = 'Bật âm thanh';
+        audio.setWaterFlow(0);
+        audio.setDrainFlow(0);
+      }
+    });
+
+    btnHelp.addEventListener('click', () => {
+      helpModal.style.display = 'block';
+    });
+    closeModalX.addEventListener('click', () => {
+      helpModal.style.display = 'none';
+    });
+    closeModalBtn.addEventListener('click', () => {
+      helpModal.style.display = 'none';
+    });
+
+    btnFullscreen.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    });
+
+    /* ==========================================================================
+       6. CONTINUOUS SIMULATION LOOP (60 FPS)
+       ========================================================================= */
+    let lastTime = performance.now();
+    let dripTimer = 0;
+
+    function step(currentTime) {
+      const dt = Math.min(0.1, (currentTime - lastTime) / 1000);
+      lastTime = currentTime;
+
+      const totalVolBefore = state.soluteVolume + state.waterVolume;
+      const freeVolume = Math.max(0, MAX_BEAKER_VOLUME - totalVolBefore);
+
+      // 1. Solute Dropper
+      if (state.isDropperPressed && freeVolume > 0.0001) {
+        const addAmount = Math.min(freeVolume, 0.45 * dt);
+        state.soluteVolume += addAmount;
+        state.dropperDispensing = true;
+        
+        dripTimer += dt;
+        if (dripTimer > 0.12) {
+          audio.playDrip();
+          dripTimer = 0;
+        }
+      } else {
+        state.dropperDispensing = false;
+      }
+
+      // 2. Water Faucet
+      if (state.waterFaucetFlow > 0 && freeVolume > 0.0001) {
+        const addWater = Math.min(freeVolume, state.waterFaucetFlow * 0.45 * dt);
+        state.waterVolume += addWater;
+      } else if (freeVolume <= 0.0001 && state.waterFaucetFlow > 0) {
+        setWaterFaucetFlow(0);
+      }
+
+      // 3. Drain Faucet
+      const currentTotalVol = state.soluteVolume + state.waterVolume;
+      if (state.drainFaucetFlow > 0 && currentTotalVol > 0.0001) {
+        const drainAmount = Math.min(currentTotalVol, state.drainFaucetFlow * 0.45 * dt);
+        const solRatio = state.soluteVolume / currentTotalVol;
+        const watRatio = state.waterVolume / currentTotalVol;
+        state.soluteVolume = Math.max(0, state.soluteVolume - drainAmount * solRatio);
+        state.waterVolume = Math.max(0, state.waterVolume - drainAmount * watRatio);
+      } else if (currentTotalVol <= 0.0001 && state.drainFaucetFlow > 0) {
+        setDrainFaucetFlow(0);
+      }
+
+      updateUI();
+      requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+
+    /* ==========================================================================
+       7. VIEW SYNCHRONIZATION & RENDERING
+       ========================================================================== */
+    function updateUI() {
+      const totalVol = state.soluteVolume + state.waterVolume;
+      const currentBeakerPH = computePH(state.currentSolute.pH, state.soluteVolume, state.waterVolume);
+      const solColorRGB = getSolutionColor(state.currentSolute, state.soluteVolume, state.waterVolume);
+      const solColorCSS = 'rgb(' + solColorRGB.join(',') + ')';
+      const stockColorCSS = 'rgb(' + state.currentSolute.stockColor.join(',') + ')';
+
+      // 7.1 Update Solute Selector Button
+      comboSwatch.setAttribute('fill', stockColorCSS);
+      comboTitle.textContent = state.currentSolute.name;
+
+      // 7.2 Update Dropper Body
+      dropperFluid.setAttribute('fill', stockColorCSS);
+
+      // 7.3 Update Liquid in Beaker
+      const liquidHeightPx = (totalVol / MAX_BEAKER_VOLUME) * BEAKER_HEIGHT_PX;
+      const surfaceY = BEAKER_BOTTOM_Y - liquidHeightPx;
+
+      if (totalVol > 0.001) {
+        liquidBody.style.display = 'block';
+        liquidBody.setAttribute('y', surfaceY);
+        liquidBody.setAttribute('height', liquidHeightPx);
+        liquidBody.setAttribute('fill', solColorCSS);
+
+        liquidSurfaceLine.style.display = 'block';
+        liquidSurfaceLine.setAttribute('y1', surfaceY);
+        liquidSurfaceLine.setAttribute('y2', surfaceY);
+
+        if (state.waterFaucetFlow > 0 || state.dropperDispensing) {
+          liquidWaves.style.opacity = '1';
+          const wavePhase = (performance.now() / 150) % 20;
+          liquidWaves.setAttribute('d', 'M 525,' + surfaceY + ' Q 637,' + (surfaceY - 3 + Math.sin(wavePhase)) + ' 750,' + surfaceY + ' T 975,' + surfaceY + ' L 975,' + (surfaceY + 8) + ' L 525,' + (surfaceY + 8) + ' Z');
+        } else {
+          liquidWaves.style.opacity = '0';
+        }
+      } else {
+        liquidBody.style.display = 'none';
+        liquidSurfaceLine.style.display = 'none';
+        liquidWaves.style.opacity = '0';
+      }
+
+      // Volume indicator pointer & text
+      volumeIndicator.setAttribute('transform', 'translate(978, ' + surfaceY + ')');
+      volumeText.textContent = totalVol.toFixed(2) + ' L';
+
+      // Neutral Indicator Badge inside beaker
+      if (totalVol > 0.01 && currentBeakerPH !== null && Math.abs(currentBeakerPH - 7.00) <= 0.02) {
+        neutralBadge.style.opacity = '1';
+      } else {
+        neutralBadge.style.opacity = '0';
+      }
+
+      // 7.4 Dropper Stream
+      if (state.dropperDispensing) {
+        dropperStream.style.display = 'block';
+        dropperStreamRect.setAttribute('fill', stockColorCSS);
+        dropperStreamRect.setAttribute('height', Math.max(0, surfaceY - 265));
+        dropperSplash.setAttribute('cy', surfaceY);
+        dropperSplash.setAttribute('fill', stockColorCSS);
+      } else {
+        dropperStream.style.display = 'none';
+      }
+
+      // 7.5 Water Faucet Stream
+      if (state.waterFaucetFlow > 0) {
+        waterStream.style.display = 'block';
+        const streamH = Math.max(0, surfaceY - 235);
+        waterStreamRect.setAttribute('height', streamH);
+        waterSplash.setAttribute('cy', surfaceY);
+      } else {
+        waterStream.style.display = 'none';
+      }
+
+      // 7.6 Drain Faucet Stream
+      if (state.drainFaucetFlow > 0 && totalVol > 0.001) {
+        drainStream.style.display = 'block';
+        drainStreamRect.setAttribute('fill', solColorCSS);
+      } else {
+        drainStream.style.display = 'none';
+      }
+
+      // 7.7 Mode-dependent Updates
+      if (state.mode === 'meter') {
+        updateProbeSense(currentBeakerPH, surfaceY, totalVol);
+      } else {
+        updateStripsSense(currentBeakerPH, surfaceY, totalVol);
+        renderPaperMode();
+      }
+    }
+
+    /* Mode 1: Probe Sensing & Scale Pointer Update */
+    function updateProbeSense(currentBeakerPH, surfaceY, totalVol) {
+      const px = state.probe.x;
+      const py = state.probe.y;
+      let detectedPH = null;
+
+      // 1. Inside beaker liquid
+      if (totalVol > 0.005 && px >= 525 && px <= 975 && py >= surfaceY && py <= BEAKER_BOTTOM_Y) {
+        detectedPH = currentBeakerPH;
+      }
+      // 2. Under water faucet stream
+      else if (state.waterFaucetFlow > 0 && Math.abs(px - 925) <= 24 && py >= 235 && py <= surfaceY) {
+        detectedPH = 7.00;
+      }
+      // 3. Under dropper stream
+      else if (state.dropperDispensing && Math.abs(px - 700) <= 16 && py >= 265 && py <= surfaceY) {
+        detectedPH = state.currentSolute.pH;
+      }
+      // 4. Under drain faucet stream
+      else if (state.drainFaucetFlow > 0 && totalVol > 0.005 && Math.abs(px - 450) <= 20 && py >= 623 && py <= 700) {
+        detectedPH = currentBeakerPH;
+      }
+
+      state.probe.measuredPH = detectedPH;
+      updateIndicatorDisplay(detectedPH);
+    }
+
+    function updateIndicatorDisplay(pH) {
+      if (pH !== null && !isNaN(pH)) {
+        const clamped = Math.max(0, Math.min(14, pH));
+        const targetY = (14 - clamped) / 14 * 450;
+
+        phIndicatorGroup.setAttribute('transform', 'translate(0, ' + targetY + ')');
+        indicatorLine.style.display = 'block';
+        badgeVal.textContent = clamped.toFixed(2);
+        badgeBg.setAttribute('fill', '#40006f');
+        badgeBg.setAttribute('opacity', '1');
+      } else {
+        badgeVal.textContent = '--';
+        badgeBg.setAttribute('opacity', '0.7');
+        indicatorLine.style.display = 'none';
+      }
+    }
+
+    function updateProbeView() {
+      probeGroup.setAttribute('transform', 'translate(' + state.probe.x + ', ' + state.probe.y + ')');
+
+      const startX = 150;
+      const startY = 525;
+      const endX = state.probe.x - 70;
+      const endY = state.probe.y;
+
+      const dx = endX - startX;
+      const dy = endY - startY;
+      const sag = Math.max(60, Math.min(180, Math.abs(dx) * 0.4 + 40));
+
+      const cp1X = startX + dx * 0.25;
+      const cp1Y = Math.max(startY, endY) + sag;
+      const cp2X = startX + dx * 0.75;
+      const cp2Y = Math.max(startY, endY) + sag * 0.8;
+
+      probeCable.setAttribute('d', 'M ' + startX + ',' + startY + ' C ' + cp1X + ',' + cp1Y + ' ' + cp2X + ',' + cp2Y + ' ' + endX + ',' + endY);
+    }
+
+    /* Mode 2: Test Strips Sensing & Reaction Updates */
+    function updateStripsSense(currentBeakerPH, surfaceY, totalVol) {
+      if (currentBeakerPH === undefined) {
+        currentBeakerPH = computePH(state.currentSolute.pH, state.soluteVolume, state.waterVolume);
+        const total = state.soluteVolume + state.waterVolume;
+        const liquidH = (total / MAX_BEAKER_VOLUME) * BEAKER_HEIGHT_PX;
+        surfaceY = BEAKER_BOTTOM_Y - liquidH;
+        totalVol = total;
+      }
+
+      Object.values(stripsState).forEach(strip => {
+        // Strip bottom tip coordinates: tip is at strip.x + 19, strip.y + 195
+        const tipX = strip.x + 19;
+        const tipY = strip.y + 195;
+        const midY = strip.y + 140;
+
+        let detectedPH = null;
+
+        // Collision: Inside Beaker Liquid
+        if (totalVol > 0.005 && tipX >= 520 && tipX <= 980 && tipY >= surfaceY && midY <= BEAKER_BOTTOM_Y) {
+          detectedPH = currentBeakerPH;
+        }
+        // Collision: Under Water Stream
+        else if (state.waterFaucetFlow > 0 && Math.abs(tipX - 925) <= 25 && tipY >= 235 && tipY <= surfaceY) {
+          detectedPH = 7.00;
+        }
+        // Collision: Under Dropper Stream
+        else if (state.dropperDispensing && Math.abs(tipX - 700) <= 20 && tipY >= 265 && tipY <= surfaceY) {
+          detectedPH = state.currentSolute.pH;
+        }
+        // Collision: Under Drain Stream
+        else if (state.drainFaucetFlow > 0 && totalVol > 0.005 && Math.abs(tipX - 450) <= 25 && tipY >= 623 && tipY <= 700) {
+          detectedPH = currentBeakerPH;
+        }
+
+        if (detectedPH !== null && !isNaN(detectedPH)) {
+          if (!strip.dipped) {
+            audio.playDip();
+            strip.dipped = true;
+          }
+          // Calculate specific indicator reaction
+          if (strip.id === 'litmus') {
+            const res = getLitmusReaction(detectedPH);
+            strip.dippedColor = res.color;
+            strip.reactionText = res.text;
+            strip.reactionDesc = res.desc;
+          } else if (strip.id === 'phenol') {
+            const res = getPhenolReaction(detectedPH);
+            strip.dippedColor = res.color;
+            strip.reactionText = res.text;
+            strip.reactionDesc = res.desc;
+          } else if (strip.id === 'universal') {
+            const res = getUniversalReaction(detectedPH);
+            strip.dippedColor = res.color;
+            strip.reactionText = res.text;
+            strip.reactionDesc = res.desc;
+          }
+        }
+      });
+    }
+
+    /* Render Mode 2 Indicators and Live Observation Panel */
+    function renderPaperMode() {
+      // 1. Update Test Strip SVG Colors & Meniscus Lines
+      const litmusCSS = 'rgb(' + stripsState.litmus.dippedColor.join(',') + ')';
+      litmusPaperTip.setAttribute('fill', litmusCSS);
+      litmusMeniscus.style.display = stripsState.litmus.dipped ? 'block' : 'none';
+
+      const phenolCSS = 'rgb(' + stripsState.phenol.dippedColor.join(',') + ')';
+      phenolPaperTip.setAttribute('fill', phenolCSS);
+      phenolMeniscus.style.display = stripsState.phenol.dipped ? 'block' : 'none';
+
+      const univCSS = 'rgb(' + stripsState.universal.dippedColor.join(',') + ')';
+      univPaperTip.setAttribute('fill', univCSS);
+      univMeniscus.style.display = stripsState.universal.dipped ? 'block' : 'none';
+
+      // 2. Update Live Observation Card
+      const currentBeakerPH = computePH(state.currentSolute.pH, state.soluteVolume, state.waterVolume);
+      const phText = currentBeakerPH !== null ? currentBeakerPH.toFixed(2) : '--';
+      liveSoluteName.textContent = 'Dung dịch: ' + state.currentSolute.name + ' (pH = ' + phText + ')';
+
+      // Readout 1: Litmus
+      swatchLitmusRes.setAttribute('fill', litmusCSS);
+      textLitmusRes.textContent = stripsState.litmus.reactionText;
+      textLitmusRes.setAttribute('fill', stripsState.litmus.dipped ? '#0f172a' : '#64748b');
+
+      // Readout 2: Phenol
+      swatchPhenolRes.setAttribute('fill', phenolCSS);
+      textPhenolRes.textContent = stripsState.phenol.reactionText;
+      textPhenolRes.setAttribute('fill', stripsState.phenol.dipped ? '#0f172a' : '#64748b');
+
+      // Readout 3: Universal Paper
+      swatchUnivRes.setAttribute('fill', univCSS);
+      textUnivRes.textContent = stripsState.universal.reactionText;
+      textUnivRes.setAttribute('fill', stripsState.universal.dipped ? '#0f172a' : '#64748b');
+
+      // 3. Conclusion Banner
+      if (currentBeakerPH !== null) {
+        if (currentBeakerPH < 6.8) {
+          conclusionBg.setAttribute('fill', '#e53935'); // Red for Acid
+          conclusionVal.textContent = 'AXIT (pH = ' + phText + ')';
+        } else if (currentBeakerPH <= 7.2) {
+          conclusionBg.setAttribute('fill', '#2e7d32'); // Green for Neutral
+          conclusionVal.textContent = 'TRUNG TÍNH (pH 7.00)';
+        } else {
+          conclusionBg.setAttribute('fill', '#1565c0'); // Blue for Base
+          conclusionVal.textContent = 'BAZƠ / KIỀM (pH = ' + phText + ')';
+        }
+      } else {
+        conclusionBg.setAttribute('fill', '#64748b');
+        conclusionVal.textContent = 'CHƯA CÓ CHẤT LỎNG';
+      }
+    }
+
+    // Initial Setup
+    updateProbeView();
+    updateUI();
+  </script>
+</body>
+</html>
